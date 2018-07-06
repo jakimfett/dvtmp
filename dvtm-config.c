@@ -224,7 +224,7 @@ static char *title;
 #include "config.h"
 
 /* global variables */
-static const char *dvtm_name = "dvtm";
+static const char *dvtm_name = "dvtm-config";
 Screen screen = { .mfact = MFACT, .nmaster = NMASTER, .history = SCROLL_HISTORY };
 static Client *stack = NULL;
 static Client *sel = NULL;
@@ -992,7 +992,7 @@ create(const char *args[]) {
 	const char *pargs[4] = { shell, NULL };
 	char buf[8], *cwd = NULL;
 	const char *env[] = {
-		"DVTM_WINDOW_ID", buf,
+		"DVTM_CONFIG_WINDOW_ID", buf,
 		NULL
 	};
 
@@ -1048,7 +1048,7 @@ copymode(const char *args[]) {
 	if (!(sel->editor = vt_create(sel->h - sel->has_title_line, sel->w, 0)))
 		return;
 
-	char *ed = getenv("DVTM_EDITOR");
+	char *ed = getenv("DVTM_CONFIG_EDITOR");
 	int *to = &sel->editor_fds[0], *from = NULL;
 	sel->editor_fds[0] = sel->editor_fds[1] = -1;
 
@@ -1638,13 +1638,24 @@ open_or_create_fifo(const char *name, const char **name_created) {
 static void
 usage(void) {
 	cleanup();
-	eprint("usage: dvtm [-v] [-M] [-m mod] [-d delay] [-h lines] [-t title] "
+	eprint("usage: dvtm-config [-v] [-M] [-m mod] [-d delay] [-h lines] [-t title] "
 	       "[-s status-fifo] [-c cmd-fifo] [cmd...]\n");
 	exit(EXIT_FAILURE);
 }
 
+void upd_bindings(int ix_key, char curr_key, char *skey, KeyBinding *obindings) {
+	char *nkey = skey;
+	if (nkey[0] == '^' && nkey[1])
+		*nkey = CTRL(nkey[1]);
+	for (unsigned int b = 0; b < LENGTH(bindings); b++) {
+		//printf("Checking array key %c against current key %c new key %c\n", obindings[b].keys[ix_key], curr_key, nkey);
+		if (obindings[b].keys[ix_key] == curr_key)
+			bindings[b].keys[ix_key] = *nkey;
+	}
+}
+
 static bool
-parse_args(int argc, char *argv[]) {
+parse_args(int argc, char *argv[], KeyBinding *obindings) {
 	bool init = false;
 	const char *name = argv[0];
 
@@ -1666,18 +1677,13 @@ parse_args(int argc, char *argv[]) {
 			usage();
 		switch (argv[arg][1]) {
 			case 'v':
-				puts("dvtm-"VERSION" © 2007-2016 Marc André Tanner");
+				puts("dvtm-config-"VERSION" © 2007-2016 Marc André Tanner");
 				exit(EXIT_SUCCESS);
 			case 'M':
 				mouse_events_enabled = !mouse_events_enabled;
 				break;
 			case 'm': {
-				char *mod = argv[++arg];
-				if (mod[0] == '^' && mod[1])
-					*mod = CTRL(mod[1]);
-				for (unsigned int b = 0; b < LENGTH(bindings); b++)
-					if (bindings[b].keys[0] == MOD)
-						bindings[b].keys[0] = *mod;
+				upd_bindings(0, MOD, argv[++arg], obindings);
 				break;
 			}
 			case 'd':
@@ -1702,7 +1708,7 @@ parse_args(int argc, char *argv[]) {
 				cmdfifo.fd = open_or_create_fifo(argv[++arg], &cmdfifo.file);
 				if (!(fifo = realpath(argv[arg], NULL)))
 					error("%s\n", strerror(errno));
-				setenv("DVTM_CMD_FIFO", fifo, 1);
+				setenv("DVTM_CONFIG_CMD_FIFO", fifo, 1);
 				break;
 			}
 			default:
@@ -1712,6 +1718,37 @@ parse_args(int argc, char *argv[]) {
 	return init;
 }
 
+void eval_envs(KeyBinding *obindings) {
+	
+	struct env_mod_t {
+		char keyb;
+		const char *envn;
+	};
+	struct env_mod_t env_mods[] = {
+		{CREATE, "DVTM_CONFIG_CREATE"},
+		{CREATE_CWD, "DVTM_CONFIG_CREATE_CWD"},
+		{FOCUS_NEXT, "DVTM_CONFIG_FOCUSNEXT"},
+		{FOCUS_NEXT_MIN, "DVTM_CONFIG_FOCUSNEXT_MIN"},
+		{FOCUS_PREV, "DVTM_CONFIG_FOCUSPREV"},
+		{FOCUS_PREV_MIN, "DVTM_CONFIG_FOCUSPRE_MINV"},
+		{SETMFACT_LEFT, "DVTM_CONFIG_SETMFACT_DECR"},
+		{SETMFACT_RIGHT, "DVTM_CONFIG_SETMFACT_INCR"},
+		{TOGGLE_MIN, "DVTM_CONFIG_TOGGLE_MIN"},
+		{REDRAW_CTL_L, "DVTM_CONFIG_REDRAW"},
+		{REDRAW_R, "DVTM_CONFIG_REDRAW"}};
+
+	int elen = sizeof(env_mods) / sizeof(struct env_mod_t);
+	for (int ic = 0 ; ic < elen ; ic++) {
+		char *nkb = getenv(env_mods[ic].envn);
+		//FIX printf("checking %c %s %d\n", env_mods[ic].keyb, env_mods[ic].envn, nkb);
+		if (nkb != NULL) {
+			upd_bindings(1, env_mods[ic].keyb, nkb, obindings);
+			//printf("processed %c %s\n", env_mods[ic].keyb, nkb);
+		}
+	}
+	
+}
+
 int
 main(int argc, char *argv[]) {
 	KeyCombo keys;
@@ -1719,11 +1756,19 @@ main(int argc, char *argv[]) {
 	memset(keys, 0, sizeof(keys));
 	sigset_t emptyset, blockset;
 
-	setenv("DVTM", VERSION, 1);
-	if (!parse_args(argc, argv)) {
+	KeyBinding *obindings;
+
+	obindings = malloc(sizeof(bindings));
+	memcpy(obindings, bindings, sizeof(bindings));
+
+	setenv("DVTM_CONFIG", VERSION, 1);
+	if (!parse_args(argc, argv, obindings)) {
+		printf("parse_args false\n");
 		setup();
 		startup(NULL);
 	}
+	eval_envs(obindings);
+	free(obindings);
 
 	sigemptyset(&emptyset);
 	sigemptyset(&blockset);

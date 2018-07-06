@@ -1834,9 +1834,9 @@ void vt_init(void)
 {
 	init_colors();
 	is_utf8_locale();
-	char *term = getenv("DVTM_TERM");
+	char *term = getenv("DVTM_CONFIG_TERM");
 	if (!term)
-		term = "dvtm";
+		term = "dvtm-config";
 	snprintf(vt_term, sizeof vt_term, "%s%s", term, COLORS >= 256 ? "-256color" : "");
 }
 

@@ -70,6 +70,18 @@ static Layout layouts[] = {
 };
 
 #define MOD  CTRL('g')
+#define CREATE  'c'
+#define CREATE_CWD  'C'
+#define FOCUS_NEXT  'j'
+#define FOCUS_NEXT_MIN  'J'
+#define FOCUS_PREV  'k'
+#define FOCUS_PREV_MIN  'K'
+#define SETMFACT_LEFT  'h'
+#define SETMFACT_RIGHT  'l'
+#define TOGGLE_MIN  '.'
+#define REDRAW_CTL_L  CTRL('L')
+#define REDRAW_R  'r'
+
 #define TAGKEYS(KEY,TAG) \
 	{ { MOD, 'v', KEY,     }, { view,           { tags[TAG] }               } }, \
 	{ { MOD, 't', KEY,     }, { tag,            { tags[TAG] }               } }, \
@@ -78,13 +90,13 @@ static Layout layouts[] = {
 
 /* you can at most specifiy MAX_ARGS (3) number of arguments */
 static KeyBinding bindings[] = {
-	{ { MOD, 'c',          }, { create,         { NULL }                    } },
-	{ { MOD, 'C',          }, { create,         { NULL, NULL, "$CWD" }      } },
+	{ { MOD, CREATE,          }, { create,         { NULL }                    } },
+	{ { MOD, CREATE_CWD,          }, { create,         { NULL, NULL, "$CWD" }      } },
 	{ { MOD, 'x', 'x',     }, { killclient,     { NULL }                    } },
-	{ { MOD, 'j',          }, { focusnext,      { NULL }                    } },
-	{ { MOD, 'J',          }, { focusnextnm,    { NULL }                    } },
-	{ { MOD, 'K',          }, { focusprevnm,    { NULL }                    } },
-	{ { MOD, 'k',          }, { focusprev,      { NULL }                    } },
+	{ { MOD, FOCUS_NEXT,          }, { focusnext,      { NULL }                    } },
+	{ { MOD, FOCUS_NEXT_MIN,          }, { focusnextnm,    { NULL }                    } },
+	{ { MOD, FOCUS_PREV_MIN,          }, { focusprevnm,    { NULL }                    } },
+	{ { MOD, FOCUS_PREV,          }, { focusprev,      { NULL }                    } },
 	{ { MOD, 'f',          }, { setlayout,      { "[]=" }                   } },
 	{ { MOD, 'g',          }, { setlayout,      { "+++" }                   } },
 	{ { MOD, 'b',          }, { setlayout,      { "TTT" }                   } },
@@ -92,9 +104,9 @@ static KeyBinding bindings[] = {
 	{ { MOD, ' ',          }, { setlayout,      { NULL }                    } },
 	{ { MOD, 'i',          }, { incnmaster,     { "+1" }                    } },
 	{ { MOD, 'd',          }, { incnmaster,     { "-1" }                    } },
-	{ { MOD, 'h',          }, { setmfact,       { "-0.05" }                 } },
-	{ { MOD, 'l',          }, { setmfact,       { "+0.05" }                 } },
-	{ { MOD, '.',          }, { toggleminimize, { NULL }                    } },
+	{ { MOD, SETMFACT_LEFT,          }, { setmfact,       { "-0.05" }                 } },
+	{ { MOD, SETMFACT_RIGHT,          }, { setmfact,       { "+0.05" }                 } },
+	{ { MOD, TOGGLE_MIN,          }, { toggleminimize, { NULL }                    } },
 	{ { MOD, 's',          }, { togglebar,      { NULL }                    } },
 	{ { MOD, 'S',          }, { togglebarpos,   { NULL }                    } },
 	{ { MOD, 'M',          }, { togglemouse,    { NULL }                    } },
@@ -112,14 +124,14 @@ static KeyBinding bindings[] = {
 	{ { MOD, '\t',         }, { focuslast,      { NULL }                    } },
 	{ { MOD, 'q', 'q',     }, { quit,           { NULL }                    } },
 	{ { MOD, 'a',          }, { togglerunall,   { NULL }                    } },
-	{ { MOD, CTRL('L'),    }, { redraw,         { NULL }                    } },
-	{ { MOD, 'r',          }, { redraw,         { NULL }                    } },
+	{ { MOD, REDRAW_CTL_L,    }, { redraw,         { NULL }                    } },
+	{ { MOD, REDRAW_R,          }, { redraw,         { NULL }                    } },
 	{ { MOD, 'e',          }, { copymode,       { NULL }                    } },
 	{ { MOD, '/',          }, { copymode,       { "/" }                     } },
 	{ { MOD, 'p',          }, { paste,          { NULL }                    } },
 	{ { MOD, KEY_PPAGE,    }, { scrollback,     { "-1" }                    } },
 	{ { MOD, KEY_NPAGE,    }, { scrollback,     { "1"  }                    } },
-	{ { MOD, '?',          }, { create,         { "man dvtm", "dvtm help" } } },
+	{ { MOD, '?',          }, { create,         { "man dvtm-config", "dvtm-config help" } } },
 	{ { MOD, MOD,          }, { send,           { (const char []){MOD, 0} } } },
 	{ { KEY_SPREVIOUS,     }, { scrollback,     { "-1" }                    } },
 	{ { KEY_SNEXT,         }, { scrollback,     { "1"  }                    } },
@@ -191,7 +203,7 @@ static Cmd commands[] = {
 	{ "create", { create,	{ NULL } } },
 };
 
-/* gets executed when dvtm is started */
+/* gets executed when dvtm-config is started */
 static Action actions[] = {
 	{ create, { NULL } },
 };
@@ -200,7 +212,7 @@ static char const * const keytable[] = {
 	/* add your custom key escape sequences */
 };
 
-/* editor to use for copy mode. If neither of DVTM_EDITOR, EDITOR and PAGER is
+/* editor to use for copy mode. If neither of DVTM_CONFIG_EDITOR, EDITOR and PAGER is
  * set the first entry is chosen. Otherwise the array is consulted for supported
  * options. A %d in argv is replaced by the line number at which the file should
  * be opened. If filter is true the editor is expected to work even if stdout is
@@ -210,7 +222,7 @@ static char const * const keytable[] = {
 static Editor editors[] = {
 	{ .name = "vis",         .argv = { "vis", "+%d", "-", NULL   }, .filter = true,  .color = false },
 	{ .name = "sandy",       .argv = { "sandy", "-d", "-", NULL  }, .filter = true,  .color = false },
-	{ .name = "dvtm-editor", .argv = { "dvtm-editor", "-", NULL  }, .filter = true,  .color = false },
+	{ .name = "dvtm-config-editor", .argv = { "dvtm-config-editor", "-", NULL  }, .filter = true,  .color = false },
 	{ .name = "vim",         .argv = { "vim", "+%d", "-", NULL   }, .filter = false, .color = false },
 	{ .name = "less",        .argv = { "less", "-R", "+%d", NULL }, .filter = false, .color = true  },
 	{ .name = "more",        .argv = { "more", "+%d", NULL       }, .filter = false, .color = false },

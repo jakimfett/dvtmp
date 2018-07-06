@@ -228,10 +228,10 @@ There are some pre defined macros to ease configuration.
 
 This means you haven't installed the `dvtm.info` terminfo description
 which can be done with `tic -s dvtm.info`. If for some reason you
-can't install new terminfo descriptions set the `DVTM_TERM` environment
+can't install new terminfo descriptions set the `DVTM_CONFIG_TERM` environment
 variable to a known terminal when starting `dvtm` as in
 
-    $ DVTM_TERM=rxvt dvtm
+    $ DVTM_CONFIG_TERM=rxvt dvtm
 
 This will instruct dvtm to use rxvt as `$TERM` value within its windows.
 
