@@ -1,12 +1,19 @@
 include config.mk
+PKG_NAME = dvtm-config
 
-SRC = dvtm-config.c vt.c
+RPM_DIRS = BUILD RPMS SOURCES SPECS SRPMS
+
+SRC = dvtm-config.c vt.c ini.c
+DIST_FILES = LICENSE Makefile README.md testsuite.sh config.def.h config.mk \
+		vt.h forkpty-aix.c forkpty-sunos.c tile.c bstack.c \
+		ini.h tstack.c vstack.c grid.c fullscreen.c fibonacci.c \
+		dvtm-config-status dvtm-config.info dvtm-config.1
 OBJ = ${SRC:.c=.o}
 
 all: clean options dvtm-config
 
 options:
-	@echo dvtm-config build options:
+	@echo $(PKG_NAME) build options:
 	@echo "CFLAGS   = ${CFLAGS}"
 	@echo "LDFLAGS  = ${LDFLAGS}"
 	@echo "CC       = ${CC}"
@@ -27,20 +34,37 @@ dvtm-config: ${OBJ}
 debug: clean
 	@make CFLAGS='${DEBUG_CFLAGS}'
 
+clean-rpm:
+	@rm -rf $(RPM_DIRS)
+
 clean:
 	@echo cleaning
-	@rm -f dvtm-config ${OBJ} dvtm-config-${VERSION}.tar.gz
+	@rm -f dvtm-config ${OBJ} $(PKG_NAME)-${VERSION}.tar.gz
+	@rm -rf $(RPM_DIRS)
 
 dist: clean
 	@echo creating dist tarball
-	@mkdir -p dvtm-config-${VERSION}
-	@cp -R LICENSE Makefile README.md testsuite.sh config.def.h config.mk \
-		${SRC} vt.h forkpty-aix.c forkpty-sunos.c tile.c bstack.c \
-		tstack.c vstack.c grid.c fullscreen.c fibonacci.c \
-		dvtm-config-status dvtm-config.info dvtm-config.1 dvtm-config-${VERSION}
-	@tar -cf dvtm-config-${VERSION}.tar dvtm-config-${VERSION}
-	@gzip dvtm-config-${VERSION}.tar
-	@rm -rf dvtm-config-${VERSION}
+	@mkdir -p $(PKG_NAME)-${VERSION}
+	@cp -R $(SRC) $(DIST_FILES) \
+		 $(PKG_NAME)-${VERSION}
+	@tar -cf $(PKG_NAME)-${VERSION}.tar $(PKG_NAME)-${VERSION}
+	@gzip $(PKG_NAME)-${VERSION}.tar
+	@rm -rf $(PKG_NAME)-${VERSION}
+
+$(RPM_DIRS)/:
+	@mkdir -p ~/rpmbuild/$@
+
+dist-rpm: clean $(RPM_DIRS)/
+	@echo creating dist tarball
+	@mkdir -p $(PKG_NAME)-${VERSION}
+	@cp -R $(SRC) $(DIST_FILES) \
+		 $(PKG_NAME)-${VERSION}
+	@tar -cf ~/rpmbuild/SOURCES/$(PKG_NAME)-${VERSION}.tar $(PKG_NAME)-${VERSION}
+	@gzip ~/rpmbuild/SOURCES/$(PKG_NAME)-${VERSION}.tar
+	@rm -rf $(PKG_NAME)-${VERSION}
+	@cp $(PKG_NAME).spec ~/rpmbuild/SPECS
+	@cp dvtm-config-0.16-build.patch  ~/rpmbuild/SOURCES
+	@rpmbuild -v -bb --clean ~/rpmbuild/SPECS/$(PKG_NAME).spec
 
 install: dvtm-config
 	@echo stripping executable
