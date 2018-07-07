@@ -44,6 +44,8 @@ int ESCDELAY;
 # define set_escdelay(d) (ESCDELAY = (d))
 #endif
 
+#define ZOOM_EVN "DVTM_CONFIG_ZOOM"
+
 typedef struct {
 	float mfact;
 	unsigned int nmaster;
@@ -1648,7 +1650,6 @@ void upd_bindings(int ix_key, char curr_key, char *skey, KeyBinding *obindings) 
 	if (nkey[0] == '^' && nkey[1])
 		*nkey = CTRL(nkey[1]);
 	for (unsigned int b = 0; b < LENGTH(bindings); b++) {
-		//printf("Checking array key %c against current key %c new key %c\n", obindings[b].keys[ix_key], curr_key, nkey);
 		if (obindings[b].keys[ix_key] == curr_key)
 			bindings[b].keys[ix_key] = *nkey;
 	}
@@ -1739,15 +1740,17 @@ void eval_envs(KeyBinding *obindings) {
 		{TOGGLE_LAYOUTS, "DVTM_CONFIG_TOGGLE_LAYOUTS"},
 		{INCR_WINDOWS, "DVTM_CONFIG_INCR_WINDOWS"},
 		{DECR_WINDOWS, "DVTM_CONFIG_DECR_WINDOWS"},
-		{SETMFACT_LEFT, "DVTM_CONFIG_SETMFACT_DECR"},
-		{SETMFACT_RIGHT, "DVTM_CONFIG_SETMFACT_INCR"},
+		{MASTER_DECR, "DVTM_CONFIG_MASTER_DECR"},
+		{MASTER_INCR, "DVTM_CONFIG_MASTER_INCR"},
 		{TOGGLE_MIN, "DVTM_CONFIG_TOGGLE_MIN"},
 		{SHOW_HIDE_STATUS, "DVTM_CONFIG_SHOW_HIDE_STATUS"},
 		{TOGGLE_STATUS_LOC, "DVTM_CONFIG_TOGGLE_STATUS_LOC"},
 		{TOGGLE_MOUSE, "DVTM_CONFIG_TOGGLE_MOUSE"},
+		{ZOOM1, "DVTM_CONFIG_ZOOM"},
 		{FOCUS_PREV_WINDOW, "DVTM_CONFIG_FOCUS_PREV_WINDOW"},
-		{REDRAW_CTL_L, "DVTM_CONFIG_REDRAW"},
-		{REDRAW_R, "DVTM_CONFIG_REDRAW"},
+		{MULTIPLEX_TOGGLE, "DVTM_CONFIG_MULTIPLEX_TOGGLE"},
+		{REDRAW_CTL_L, "DVTM_CONFIG_REDRAW1"},
+		{REDRAW_R, "DVTM_CONFIG_REDRAW2"},
 		{COPY_MODE1, "DVTM_CONFIG_COPY_MODE1"},
 		{COPY_MODE2, "DVTM_CONFIG_COPY_MODE2"},
 		{PASTE, "DVTM_CONFIG_PASTE"},
@@ -1756,10 +1759,11 @@ void eval_envs(KeyBinding *obindings) {
 	int elen = sizeof(env_mods) / sizeof(struct env_mod_t);
 	for (int ic = 0 ; ic < elen ; ic++) {
 		char *nkb = getenv(env_mods[ic].envn);
-		//FIX printf("checking %c %s %d\n", env_mods[ic].keyb, env_mods[ic].envn, nkb);
 		if (nkb != NULL) {
 			upd_bindings(1, env_mods[ic].keyb, nkb, obindings);
-			//printf("processed %c %s\n", env_mods[ic].keyb, nkb);
+			if (!strcmp(env_mods[ic].envn, ZOOM_EVN)) {
+				upd_bindings(1, ZOOM2, nkb, obindings);
+			}
 		}
 	}
 	

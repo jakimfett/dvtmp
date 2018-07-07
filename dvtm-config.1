@@ -77,39 +77,50 @@ or with the
 command line option.
 .TP
 .B Mod\-c
-Create a new shell window.
+Create a new shell window. Change with DVTM_CONFIG_CREATE environment
+variable.
 .TP
 .B Mod\-C
-Create a new shell window using the current working directory of the focused window.
+Create a new shell window using the current working directory of the
+focused window. Change with DVTM_CONFIG_CREATE_CWD environment variable.
 .TP
 .B Mod\-x\-x
-Close focused window.
+Close focused window. Change with the DVTM_CONFIG_KILL_CLIENT
+environment variable.
 .TP
 .B Mod\-l
-Increases the master area width about 5% (all except grid and
-fullscreen layout).
+Increases the master area width about 5% (all except grid and 
+fullscreen layout). Change with the DVTM_CONFIG_MASTER_DECR environment
+variable.
 .TP
 .B Mod\-h
 Decreases the master area width about 5% (all except grid and
-fullscreen layout).
+fullscreen layout). Change with the DVTM_CONFIG_MASTER_INCR environment
+variable.
 .TP
 .B Mod\-i
-Increase number of windows displayed in the master area.
+Increase number of windows displayed in the master area. Change with
+the DVTM_CONFIG_INCR_WINDOWS environment variable.
 .TP
 .B Mod\-d
-Decrease number of windows displayed in the master area.
+Decrease number of windows displayed in the master area. Change with
+the DVTM_CONFIG_DECR_WINDOWS environment variable.
 .TP
 .B Mod\-j
-Focus next window.
+Focus next window. Change with the DVTM_CONFIG_FOCUS_NEXT environment
+variable.
 .TP
 .B Mod\-k
-Focus previous window.
+Focus previous window. Change with the DVTM_CONFIG_FOCUS_PREV environment
+variable.
 .TP
 .B Mod\-J
-Focus next non minimized window.
+Focus next non minimized window. Change with the DVTM_CONFIG_FOCUS_NEXT_MIN
+environment variable.
 .TP
 .B Mod\-K
-Focus previous non minimized window.
+Focus previous non minimized window. Change with the DVTM_CONFIG_FOCUS_PREV_MINV
+environment variable.
 .TP
 .BI Mod\- n
 Focus the
@@ -117,13 +128,15 @@ Focus the
 window.
 .TP
 .B Mod\-Tab
-Focus previously selected window.
+Focus previously selected window. Change with the DVTM_CONFIG_FOCUS_PREV_WINDOW
+environment variable.
 .TP
 .B Mod\-.
 Toggle minimization of current window.
 .TP
 .B Mod\-m
-Maximize current window (change to fullscreen layout).
+Maximize current window (change to fullscreen layout). Change with the 
+DVTM_CONFIG_MAX_WINDOW environment variable.
 .TP
 .B Shift\-PageUp
 .TQ
@@ -136,46 +149,60 @@ Scroll up.
 Scroll down.
 .TP
 .B Mod\-Space
-Toggle between defined layouts (affects all windows).
+Toggle between defined layouts (affects all windows). Change with the
+DVTM_CONFIG_TOGGLE_LAYOUTS environment variable.
 .TP
 .B Mod\-Enter
-Zooms/cycles current window to/from master area.
+Zooms/cycles current window to/from master area. Change with the
+DVTM_CONFIG_ZOOM environment variable.
 .TP
 .B Mod\-f
-Change to vertical stack tiling layout.
+Change to vertical stack tiling layout. Change with the
+DVTM_CONFIG_TILE_VERTICAL environment variable.
 .TP
 .B Mod\-b
-Change to bottom stack tiling layout.
+Change to bottom stack tiling layout. Change with the DVTM_CONFIG_TILE_BOTTOM
+environment variable.
 .TP
 .B Mod\-g
-Change to grid layout.
+Change to grid layout. Change with the DVTM_CONFIG_TILE_GRID environment
+variable.
 .TP
 .B Mod\-s
-Show/hide the status bar.
+Show/hide the status bar. Change with the DVTM_CONFIG_SHOW_HIDE_STATUS
+environment variable.
 .TP
 .B Mod\-S
-Toggle position of the status bar between top and bottom.
+Toggle position of the status bar between top and bottom. Change with the
+DVTM_CONFIG_TOGGLE_STATUS_LOC environment variable.
 .TP
 .B Mod\-r
 .TQ
 .B Mod\-^L
-Redraw whole screen.
+Redraw whole screen.  Change control mod L with the DVTM_CONFIG_REDRAW1
+environment variable. Change the Mod with r with the DVTM_CONFIG_REDRAW2
+environment variable.
 .TP
 .B Mod\-a
 Toggle keyboard multiplexing mode, if activated keypresses are sent to all
-visible windows.
+visible windows. Change with the DVTM_CONFIG_MULTIPLEX_TOGGLE environment
+variable.
 .TP
 .B Mod\-M
-Toggle dvtm-config mouse grabbing.
+Toggle dvtm-config mouse grabbing. Change with the DVTM_CONFIG_TOGGLE_MOUSE
+environment variable.
 .TP
 .B Mod\-e
-Enter copy mode (see section below for further information).
+Enter copy mode (see section below for further information). Change with
+the DVTM_CONFIG_COPY_MODE1 environment variable.
 .TP
 .B Mod\-/
 Enter copy mode and start searching forward (assumes a vi-like editor).
+Change with the DVTM_CONFIG_COPY_MODE2 environment variable.
 .TP
 .B Mod\-p
-Paste last copied text from copy mode at current cursor position.
+Paste last copied text from copy mode at current cursor position. Change
+with the DVTM_CONFIG_PASTE environment variable.
 .TP
 .B Mod\-?
 Show this manual page.

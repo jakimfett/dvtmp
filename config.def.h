@@ -84,13 +84,16 @@ static Layout layouts[] = {
 #define TOGGLE_LAYOUTS  ' '
 #define INCR_WINDOWS  'i'
 #define DECR_WINDOWS  'd'
-#define SETMFACT_LEFT  'h'
-#define SETMFACT_RIGHT  'l'
+#define MASTER_DECR  'h'
+#define MASTER_INCR  'l'
 #define TOGGLE_MIN  '.'
 #define SHOW_HIDE_STATUS  's'
 #define TOGGLE_STATUS_LOC  'S'
 #define TOGGLE_MOUSE  'M'
+#define ZOOM1  '\n'
+#define ZOOM2  '\r'
 #define FOCUS_PREV_WINDOW  '\t'
+#define MULTIPLEX_TOGGLE  'a'
 #define REDRAW_CTL_L  CTRL('L')
 #define REDRAW_R  'r'
 #define COPY_MODE1  'e'
@@ -120,14 +123,14 @@ static KeyBinding bindings[] = {
 	{ { MOD, TOGGLE_LAYOUTS,          }, { setlayout,      { NULL }                    } },
 	{ { MOD, INCR_WINDOWS,          }, { incnmaster,     { "+1" }                    } },
 	{ { MOD, DECR_WINDOWS,          }, { incnmaster,     { "-1" }                    } },
-	{ { MOD, SETMFACT_LEFT,          }, { setmfact,       { "-0.05" }                 } },
-	{ { MOD, SETMFACT_RIGHT,          }, { setmfact,       { "+0.05" }                 } },
+	{ { MOD, MASTER_DECR,          }, { setmfact,       { "-0.05" }                 } },
+	{ { MOD, MASTER_INCR,          }, { setmfact,       { "+0.05" }                 } },
 	{ { MOD, TOGGLE_MIN,          }, { toggleminimize, { NULL }                    } },
 	{ { MOD, SHOW_HIDE_STATUS,          }, { togglebar,      { NULL }                    } },
 	{ { MOD, TOGGLE_STATUS_LOC,          }, { togglebarpos,   { NULL }                    } },
 	{ { MOD, TOGGLE_MOUSE,          }, { togglemouse,    { NULL }                    } },
-	{ { MOD, '\n',         }, { zoom ,          { NULL }                    } },
-	{ { MOD, '\r',         }, { zoom ,          { NULL }                    } },
+	{ { MOD, ZOOM1,         }, { zoom ,          { NULL }                    } },
+	{ { MOD, ZOOM2,         }, { zoom ,          { NULL }                    } },
 	{ { MOD, '1',          }, { focusn,         { "1" }                     } },
 	{ { MOD, '2',          }, { focusn,         { "2" }                     } },
 	{ { MOD, '3',          }, { focusn,         { "3" }                     } },
@@ -139,7 +142,7 @@ static KeyBinding bindings[] = {
 	{ { MOD, '9',          }, { focusn,         { "9" }                     } },
 	{ { MOD, FOCUS_PREV_WINDOW,         }, { focuslast,      { NULL }                    } },
 	{ { MOD, 'q', 'q',     }, { quit,           { NULL }                    } },
-	{ { MOD, 'a',          }, { togglerunall,   { NULL }                    } },
+	{ { MOD, MULTIPLEX_TOGGLE,          }, { togglerunall,   { NULL }                    } },
 	{ { MOD, REDRAW_CTL_L,    }, { redraw,         { NULL }                    } },
 	{ { MOD, REDRAW_R,          }, { redraw,         { NULL }                    } },
 	{ { MOD, COPY_MODE1,          }, { copymode,       { NULL }                    } },
