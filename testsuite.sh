@@ -53,6 +53,12 @@ if ! which vis > /dev/null 2>&1 ; then
 	exit 0
 fi
 
+if [ "$1" = "--debug" ] ; then
+	keep_log=1
+else
+	keep_log=0
+fi
+
 {
 	echo "Testing $DVTM_CONFIG" 1>&2
 	$DVTM_CONFIG -v 1>&2
@@ -60,4 +66,7 @@ fi
 } 2> "$TEST_LOG" | $DVTM_CONFIG -m ^g 2> $LOG
 
 cat "$TEST_LOG" && rm "$TEST_LOG" $LOG
+if [ $? -eq 0 -a $keep_log -eq 0 ] ; then
+	rm "$TEST_LOG" $LOG
+fi
 rm $UTF8_TEST_FN
