@@ -72,15 +72,31 @@ static Layout layouts[] = {
 #define MOD  CTRL('g')
 #define CREATE  'c'
 #define CREATE_CWD  'C'
+#define KILL_CLIENT  'x'
 #define FOCUS_NEXT  'j'
 #define FOCUS_NEXT_MIN  'J'
-#define FOCUS_PREV  'k'
 #define FOCUS_PREV_MIN  'K'
+#define FOCUS_PREV  'k'
+#define TILE_VERTICAL  'f'
+#define TILE_GRID  'g'
+#define TILE_BOTTOM  'b'
+#define MAX_WINDOW  'm'
+#define TOGGLE_LAYOUTS  ' '
+#define INCR_WINDOWS  'i'
+#define DECR_WINDOWS  'd'
 #define SETMFACT_LEFT  'h'
 #define SETMFACT_RIGHT  'l'
 #define TOGGLE_MIN  '.'
+#define SHOW_HIDE_STATUS  's'
+#define TOGGLE_STATUS_LOC  'S'
+#define TOGGLE_MOUSE  'M'
+#define FOCUS_PREV_WINDOW  '\t'
 #define REDRAW_CTL_L  CTRL('L')
 #define REDRAW_R  'r'
+#define COPY_MODE1  'e'
+#define COPY_MODE2  '/'
+#define PASTE  'p'
+#define VIEW  'v'
 
 #define TAGKEYS(KEY,TAG) \
 	{ { MOD, 'v', KEY,     }, { view,           { tags[TAG] }               } }, \
@@ -92,24 +108,24 @@ static Layout layouts[] = {
 static KeyBinding bindings[] = {
 	{ { MOD, CREATE,          }, { create,         { NULL }                    } },
 	{ { MOD, CREATE_CWD,          }, { create,         { NULL, NULL, "$CWD" }      } },
-	{ { MOD, 'x', 'x',     }, { killclient,     { NULL }                    } },
+	{ { MOD, KILL_CLIENT, KILL_CLIENT,     }, { killclient,     { NULL }                    } },
 	{ { MOD, FOCUS_NEXT,          }, { focusnext,      { NULL }                    } },
 	{ { MOD, FOCUS_NEXT_MIN,          }, { focusnextnm,    { NULL }                    } },
 	{ { MOD, FOCUS_PREV_MIN,          }, { focusprevnm,    { NULL }                    } },
 	{ { MOD, FOCUS_PREV,          }, { focusprev,      { NULL }                    } },
-	{ { MOD, 'f',          }, { setlayout,      { "[]=" }                   } },
-	{ { MOD, 'g',          }, { setlayout,      { "+++" }                   } },
-	{ { MOD, 'b',          }, { setlayout,      { "TTT" }                   } },
-	{ { MOD, 'm',          }, { setlayout,      { "[ ]" }                   } },
-	{ { MOD, ' ',          }, { setlayout,      { NULL }                    } },
-	{ { MOD, 'i',          }, { incnmaster,     { "+1" }                    } },
-	{ { MOD, 'd',          }, { incnmaster,     { "-1" }                    } },
+	{ { MOD, TILE_VERTICAL,          }, { setlayout,      { "[]=" }                   } },
+	{ { MOD, TILE_GRID,          }, { setlayout,      { "+++" }                   } },
+	{ { MOD, TILE_BOTTOM,          }, { setlayout,      { "TTT" }                   } },
+	{ { MOD, MAX_WINDOW,          }, { setlayout,      { "[ ]" }                   } },
+	{ { MOD, TOGGLE_LAYOUTS,          }, { setlayout,      { NULL }                    } },
+	{ { MOD, INCR_WINDOWS,          }, { incnmaster,     { "+1" }                    } },
+	{ { MOD, DECR_WINDOWS,          }, { incnmaster,     { "-1" }                    } },
 	{ { MOD, SETMFACT_LEFT,          }, { setmfact,       { "-0.05" }                 } },
 	{ { MOD, SETMFACT_RIGHT,          }, { setmfact,       { "+0.05" }                 } },
 	{ { MOD, TOGGLE_MIN,          }, { toggleminimize, { NULL }                    } },
-	{ { MOD, 's',          }, { togglebar,      { NULL }                    } },
-	{ { MOD, 'S',          }, { togglebarpos,   { NULL }                    } },
-	{ { MOD, 'M',          }, { togglemouse,    { NULL }                    } },
+	{ { MOD, SHOW_HIDE_STATUS,          }, { togglebar,      { NULL }                    } },
+	{ { MOD, TOGGLE_STATUS_LOC,          }, { togglebarpos,   { NULL }                    } },
+	{ { MOD, TOGGLE_MOUSE,          }, { togglemouse,    { NULL }                    } },
 	{ { MOD, '\n',         }, { zoom ,          { NULL }                    } },
 	{ { MOD, '\r',         }, { zoom ,          { NULL }                    } },
 	{ { MOD, '1',          }, { focusn,         { "1" }                     } },
@@ -121,14 +137,14 @@ static KeyBinding bindings[] = {
 	{ { MOD, '7',          }, { focusn,         { "7" }                     } },
 	{ { MOD, '8',          }, { focusn,         { "8" }                     } },
 	{ { MOD, '9',          }, { focusn,         { "9" }                     } },
-	{ { MOD, '\t',         }, { focuslast,      { NULL }                    } },
+	{ { MOD, FOCUS_PREV_WINDOW,         }, { focuslast,      { NULL }                    } },
 	{ { MOD, 'q', 'q',     }, { quit,           { NULL }                    } },
 	{ { MOD, 'a',          }, { togglerunall,   { NULL }                    } },
 	{ { MOD, REDRAW_CTL_L,    }, { redraw,         { NULL }                    } },
 	{ { MOD, REDRAW_R,          }, { redraw,         { NULL }                    } },
-	{ { MOD, 'e',          }, { copymode,       { NULL }                    } },
-	{ { MOD, '/',          }, { copymode,       { "/" }                     } },
-	{ { MOD, 'p',          }, { paste,          { NULL }                    } },
+	{ { MOD, COPY_MODE1,          }, { copymode,       { NULL }                    } },
+	{ { MOD, COPY_MODE2,          }, { copymode,       { "/" }                     } },
+	{ { MOD, PASTE,          }, { paste,          { NULL }                    } },
 	{ { MOD, KEY_PPAGE,    }, { scrollback,     { "-1" }                    } },
 	{ { MOD, KEY_NPAGE,    }, { scrollback,     { "1"  }                    } },
 	{ { MOD, '?',          }, { create,         { "man dvtm-config", "dvtm-config help" } } },
@@ -141,8 +157,8 @@ static KeyBinding bindings[] = {
 	{ { MOD, KEY_F(3),     }, { view,           { tags[2] }                 } },
 	{ { MOD, KEY_F(4),     }, { view,           { tags[3] }                 } },
 	{ { MOD, KEY_F(5),     }, { view,           { tags[4] }                 } },
-	{ { MOD, 'v', '0'      }, { view,           { NULL }                    } },
-	{ { MOD, 'v', '\t',    }, { viewprevtag,    { NULL }                    } },
+	{ { MOD, VIEW, '0'      }, { view,           { NULL }                    } },
+	{ { MOD, VIEW, '\t',    }, { viewprevtag,    { NULL }                    } },
 	{ { MOD, 't', '0'      }, { tag,            { NULL }                    } },
 	TAGKEYS( '1',                              0)
 	TAGKEYS( '2',                              1)
