@@ -1,5 +1,5 @@
 # dvtm version
-VERSION = 0.16a
+VERSION = 0.16.2a
 
 # Customize below to fit your system
 
