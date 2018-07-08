@@ -9,6 +9,12 @@ TEST_LOG="$0.log"
 UTF8_TEST_FN="UTF-8-demo.txt"
 UTF8_TEST_URL="http://www.cl.cam.ac.uk/~mgk25/ucs/examples/$UTF8_TEST_FN"
 
+if [ "$1" = "--debug" ] ; then
+	keep_log=1
+	shift 1
+else
+	keep_log=0
+fi
 [ ! -z "$1" ] && DVTM_CONFIG="$1"
 [ ! -x "$DVTM_CONFIG" ] && echo "usage: $0 path-to-dvtm-config-binary" && exit 1
 
@@ -53,11 +59,6 @@ if ! which vis > /dev/null 2>&1 ; then
 	exit 0
 fi
 
-if [ "$1" = "--debug" ] ; then
-	keep_log=1
-else
-	keep_log=0
-fi
 
 {
 	echo "Testing $DVTM_CONFIG" 1>&2
@@ -65,7 +66,7 @@ fi
 	test_copymode && echo "copymode: OK" 1>&2 || echo "copymode: FAIL" 1>&2;
 } 2> "$TEST_LOG" | $DVTM_CONFIG -m ^g 2> $LOG
 
-cat "$TEST_LOG" && rm "$TEST_LOG" $LOG
+cat "$TEST_LOG"
 if [ $? -eq 0 -a $keep_log -eq 0 ] ; then
 	rm "$TEST_LOG" $LOG
 fi
