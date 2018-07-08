@@ -16,7 +16,7 @@ else
 	keep_log=0
 fi
 [ ! -z "$1" ] && DVTM_CONFIG="$1"
-[ ! -x "$DVTM_CONFIG" ] && echo "usage: $0 path-to-dvtm-config-binary" && exit 1
+[ ! -x "$DVTM_CONFIG" ] && echo "usage: [--debug] $0 path-to-dvtm-config-binary" && exit 1
 
 dvtm_config_input() {
 	printf "$1"
