@@ -225,6 +225,44 @@ static char *title;
 
 #include "config.h"
 
+struct env_mod_t {
+	const char *name;
+	char keyb;
+	const char *envn;
+};
+struct env_mod_t env_mods[] = {
+	{"create", CREATE, "DVTM_CONFIG_CREATE"},
+	{"create_cwd", CREATE_CWD, "DVTM_CONFIG_CREATE_CWD"},
+	{"kill_client", KILL_CLIENT, "DVTM_CONFIG_KILL_CLIENT"},
+	{"focusnext", FOCUS_NEXT, "DVTM_CONFIG_FOCUS_NEXT"},
+	{"focusnextnm", FOCUS_NEXT_MIN, "DVTM_CONFIG_FOCUS_NEXT_MIN"},
+	{"focusprevnm", FOCUS_PREV_MIN, "DVTM_CONFIG_FOCUS_PREV_MINV"},
+	{"focusprev", FOCUS_PREV, "DVTM_CONFIG_FOCUS_PREV"},
+	{"setlayout_vertical", TILE_VERTICAL, "DVTM_CONFIG_TILE_VERTICAL"},
+	{"setlayout_grid", TILE_GRID, "DVTM_CONFIG_TILE_GRID"},
+	{"setlayout_bottom", TILE_BOTTOM, "DVTM_CONFIG_TILE_BOTTOM"},
+	{"max_window", MAX_WINDOW, "DVTM_CONFIG_MAX_WINDOW"},
+	{"toggle_layouts", TOGGLE_LAYOUTS, "DVTM_CONFIG_TOGGLE_LAYOUTS"},
+	{"incmaster", INCR_WINDOWS, "DVTM_CONFIG_INCR_WINDOWS"},
+	{"decrmaster", DECR_WINDOWS, "DVTM_CONFIG_DECR_WINDOWS"},
+	{"decr_master", MASTER_DECR, "DVTM_CONFIG_MASTER_DECR"},
+	{"incr_master", MASTER_INCR, "DVTM_CONFIG_MASTER_INCR"},
+	{"toggleminimize", TOGGLE_MIN, "DVTM_CONFIG_TOGGLE_MIN"},
+	{"togglebar", SHOW_HIDE_STATUS, "DVTM_CONFIG_SHOW_HIDE_STATUS"},
+	{"togglebarpos", TOGGLE_STATUS_LOC, "DVTM_CONFIG_TOGGLE_STATUS_LOC"},
+	{"togglemouse", TOGGLE_MOUSE, "DVTM_CONFIG_TOGGLE_MOUSE"},
+	{"zoom", ZOOM1, "DVTM_CONFIG_ZOOM"},
+	{"focuslast", FOCUS_PREV_WINDOW, "DVTM_CONFIG_FOCUS_PREV_WINDOW"},
+	{"toggler_multiplex", MULTIPLEX_TOGGLE, "DVTM_CONFIG_MULTIPLEX_TOGGLE"},
+	{"redraw1", REDRAW_CTL_L, "DVTM_CONFIG_REDRAW1"},
+	{"redraw2", REDRAW_R, "DVTM_CONFIG_REDRAW2"},
+	{"copymode1", COPY_MODE1, "DVTM_CONFIG_COPY_MODE1"},
+	{"copymode2", COPY_MODE2, "DVTM_CONFIG_COPY_MODE2"},
+	{"paste", PASTE, "DVTM_CONFIG_PASTE"},
+	{"view", VIEW, "DVTM_CONFIG_VIEW"}};
+
+KeyBinding *obindings;
+
 /* global variables */
 static const char *dvtm_name = "dvtm-config";
 Screen screen = { .mfact = MFACT, .nmaster = NMASTER, .history = SCROLL_HISTORY };
@@ -1645,7 +1683,7 @@ usage(void) {
 	exit(EXIT_FAILURE);
 }
 
-void upd_bindings(int ix_key, char curr_key, char *skey, KeyBinding *obindings) {
+void upd_bindings(int ix_key, char curr_key, char *skey) {
 	char *nkey = skey;
 	if (nkey[0] == '^' && nkey[1])
 		*nkey = CTRL(nkey[1]);
@@ -1656,7 +1694,7 @@ void upd_bindings(int ix_key, char curr_key, char *skey, KeyBinding *obindings) 
 }
 
 static bool
-parse_args(int argc, char *argv[], KeyBinding *obindings) {
+parse_args(int argc, char *argv[]) {
 	bool init = false;
 	const char *name = argv[0];
 
@@ -1684,7 +1722,7 @@ parse_args(int argc, char *argv[], KeyBinding *obindings) {
 				mouse_events_enabled = !mouse_events_enabled;
 				break;
 			case 'm': {
-				upd_bindings(0, MOD, argv[++arg], obindings);
+				upd_bindings(0, MOD, argv[++arg]);
 				break;
 			}
 			case 'd':
@@ -1719,50 +1757,15 @@ parse_args(int argc, char *argv[], KeyBinding *obindings) {
 	return init;
 }
 
-void eval_envs(KeyBinding *obindings) {
+void eval_envs() {
 	
-	struct env_mod_t {
-		char keyb;
-		const char *envn;
-	};
-	struct env_mod_t env_mods[] = {
-		{CREATE, "DVTM_CONFIG_CREATE"},
-		{CREATE_CWD, "DVTM_CONFIG_CREATE_CWD"},
-		{KILL_CLIENT, "DVTM_CONFIG_KILL_CLIENT"},
-		{FOCUS_NEXT, "DVTM_CONFIG_FOCUS_NEXT"},
-		{FOCUS_NEXT_MIN, "DVTM_CONFIG_FOCUS_NEXT_MIN"},
-		{FOCUS_PREV_MIN, "DVTM_CONFIG_FOCUS_PREV_MINV"},
-		{FOCUS_PREV, "DVTM_CONFIG_FOCUS_PREV"},
-		{TILE_VERTICAL, "DVTM_CONFIG_TILE_VERTICAL"},
-		{TILE_BOTTOM, "DVTM_CONFIG_TILE_BOTTOM"},
-		{TILE_GRID, "DVTM_CONFIG_TILE_GRID"},
-		{MAX_WINDOW, "DVTM_CONFIG_MAX_WINDOW"},
-		{TOGGLE_LAYOUTS, "DVTM_CONFIG_TOGGLE_LAYOUTS"},
-		{INCR_WINDOWS, "DVTM_CONFIG_INCR_WINDOWS"},
-		{DECR_WINDOWS, "DVTM_CONFIG_DECR_WINDOWS"},
-		{MASTER_DECR, "DVTM_CONFIG_MASTER_DECR"},
-		{MASTER_INCR, "DVTM_CONFIG_MASTER_INCR"},
-		{TOGGLE_MIN, "DVTM_CONFIG_TOGGLE_MIN"},
-		{SHOW_HIDE_STATUS, "DVTM_CONFIG_SHOW_HIDE_STATUS"},
-		{TOGGLE_STATUS_LOC, "DVTM_CONFIG_TOGGLE_STATUS_LOC"},
-		{TOGGLE_MOUSE, "DVTM_CONFIG_TOGGLE_MOUSE"},
-		{ZOOM1, "DVTM_CONFIG_ZOOM"},
-		{FOCUS_PREV_WINDOW, "DVTM_CONFIG_FOCUS_PREV_WINDOW"},
-		{MULTIPLEX_TOGGLE, "DVTM_CONFIG_MULTIPLEX_TOGGLE"},
-		{REDRAW_CTL_L, "DVTM_CONFIG_REDRAW1"},
-		{REDRAW_R, "DVTM_CONFIG_REDRAW2"},
-		{COPY_MODE1, "DVTM_CONFIG_COPY_MODE1"},
-		{COPY_MODE2, "DVTM_CONFIG_COPY_MODE2"},
-		{PASTE, "DVTM_CONFIG_PASTE"},
-		{VIEW, "DVTM_CONFIG_VIEW"}};
-
 	int elen = sizeof(env_mods) / sizeof(struct env_mod_t);
 	for (int ic = 0 ; ic < elen ; ic++) {
 		char *nkb = getenv(env_mods[ic].envn);
 		if (nkb != NULL) {
-			upd_bindings(1, env_mods[ic].keyb, nkb, obindings);
+			upd_bindings(1, env_mods[ic].keyb, nkb);
 			if (!strcmp(env_mods[ic].envn, ZOOM_EVN)) {
-				upd_bindings(1, ZOOM2, nkb, obindings);
+				upd_bindings(1, ZOOM2, nkb);
 			}
 		}
 	}
@@ -1776,18 +1779,15 @@ main(int argc, char *argv[]) {
 	memset(keys, 0, sizeof(keys));
 	sigset_t emptyset, blockset;
 
-	KeyBinding *obindings;
-
 	obindings = malloc(sizeof(bindings));
 	memcpy(obindings, bindings, sizeof(bindings));
 
 	setenv("DVTM_CONFIG", VERSION, 1);
-	if (!parse_args(argc, argv, obindings)) {
-		printf("parse_args false\n");
+	if (!parse_args(argc, argv)) {
 		setup();
 		startup(NULL);
 	}
-	eval_envs(obindings);
+	eval_envs();
 	free(obindings);
 
 	sigemptyset(&emptyset);

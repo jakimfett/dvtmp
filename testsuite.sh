@@ -59,7 +59,6 @@ if ! which vis > /dev/null 2>&1 ; then
 	exit 0
 fi
 
-
 {
 	echo "Testing $DVTM_CONFIG" 1>&2
 	$DVTM_CONFIG -v 1>&2
