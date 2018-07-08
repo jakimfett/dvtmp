@@ -937,8 +937,29 @@ getshell(void) {
 
 static void
 setup(void) {
+	char iniFileName[256];
+	FILE *iniFile;
+
 	shell = getshell();
 	setlocale(LC_CTYPE, "");
+
+	// Read config file if present:
+	char *home_dir = NULL;
+	if ((home_dir = getenv("HOME") == NULL) {
+		if ((home_dir = getenv("APPDATA") == NULL) {
+			home_dir = "";
+		}
+	}
+	snprintf(iniFileName, 255, "%s/.dvtm-config.conf", home_dir);
+	if (access(iniFileName, R_OK)==0) {
+		printf("Config file found.\n");
+		if (ini_parse(iniFileName, ini_handler, NULL) < 0) {
+			fprintf(stderr, "Error reading config file.");
+			exit(1);
+		}
+	}
+
+
 	initscr();
 	start_color();
 	noecho();
