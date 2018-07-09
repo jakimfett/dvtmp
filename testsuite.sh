@@ -34,6 +34,10 @@ sh_cmd() {
 }
 
 test_copymode() { # requires wget, diff, vis
+	dvtm_config_cmd 'c'
+	dvtm_config_cmd 'c'
+	dvtm_config_cmd 'c'
+	dvtm_config_cmd '1'
 	local FILENAME="UTF-8-demo.txt"
 	local COPY="$FILENAME.copy"
 	[ ! -e "$FILENAME" ] && (wget "$UTF8_TEST_URL" -O "$FILENAME" > /dev/null 2>&1 || return 1)
@@ -50,17 +54,8 @@ test_copymode() { # requires wget, diff, vis
 	dvtm_config_input ":"
 	dvtm_config_input "wq!\n"
 	sleep 2
-	sh_cmd "$DVTM_CONFIG_EDITOR"
-	sleep 2
-	dvtm_config_input "a"
-	dvtm_config_cmd 'p'
-	dvtm_config_input ":"
-	dvtm_config_input "f $COPY\n"
-	dvtm_config_input ":"
-	dvtm_config_input "wq\n"
-	#sh_cmd "cat <<'EOF' > $COPY"
-	#dvtm_config_cmd 'p'
-	#sh_cmd 'EOF'
+	dvtm_config_cmd '2'
+	sh_cmd "cat <<'EOF' > $COPY"
 	while [ ! -r "$COPY" ]; do sleep 1; done;
 	dvtm_config_input "exit\n"
 	diff -u "$FILENAME" "$COPY" 1>&2
