@@ -1,4 +1,5 @@
 #!/bin/sh
+#set -n
 
 MOD="" # CTRL+g
 ESC="" # \e
@@ -24,12 +25,12 @@ dvtm_config_input() {
 
 dvtm_config_cmd() {
 	printf "${MOD}$1"
-	sleep 1
+	sleep 2
 }
 
 sh_cmd() {
 	printf "$1\n"
-	sleep 1
+	sleep 2
 }
 
 test_copymode() { # requires wget, diff, vis
@@ -39,13 +40,27 @@ test_copymode() { # requires wget, diff, vis
 	sleep 1
 	sh_cmd "cat $FILENAME"
 	dvtm_config_cmd 'e'
+	sleep 2
 	dvtm_config_input "?UTF-8 encoded\n"
-	dvtm_config_input '^kvG1k$'
-	dvtm_config_input ":wq!\n"
-	sleep 1
-	sh_cmd "cat <<'EOF' > $COPY"
+	#Split up input to stop it from getting caught in edit mode.
+	dvtm_config_input '^'
+	dvtm_config_input 'k'
+	dvtm_config_input 'vG'
+	dvtm_config_input '1k$'
+	dvtm_config_input ":"
+	dvtm_config_input "wq!\n"
+	sleep 2
+	sh_cmd "$DVTM_CONFIG_EDITOR"
+	sleep 2
+	dvtm_config_input "a"
 	dvtm_config_cmd 'p'
-	sh_cmd 'EOF'
+	dvtm_config_input ":"
+	dvtm_config_input "f $COPY\n"
+	dvtm_config_input ":"
+	dvtm_config_input "wq\n"
+	#sh_cmd "cat <<'EOF' > $COPY"
+	#dvtm_config_cmd 'p'
+	#sh_cmd 'EOF'
 	while [ ! -r "$COPY" ]; do sleep 1; done;
 	dvtm_config_input "exit\n"
 	diff -u "$FILENAME" "$COPY" 1>&2

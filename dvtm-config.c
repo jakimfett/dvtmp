@@ -35,6 +35,7 @@
 # include <termios.h>
 #endif
 #include "vt.h"
+#include "ini.h"
 
 #ifdef PDCURSES
 int ESCDELAY;
@@ -260,6 +261,8 @@ struct env_mod_t env_mods[] = {
 	{"copymode2", COPY_MODE2, "DVTM_CONFIG_COPY_MODE2"},
 	{"paste", PASTE, "DVTM_CONFIG_PASTE"},
 	{"view", VIEW, "DVTM_CONFIG_VIEW"}};
+
+int elen = sizeof(env_mods) / sizeof(struct env_mod_t);
 
 KeyBinding *obindings;
 
@@ -935,6 +938,38 @@ getshell(void) {
 	return "/bin/sh";
 }
 
+void upd_char_bindings(int ix_key, char curr_key, const char *skey) {
+	char *nkey = strdup(skey);
+	if (nkey[0] == '^' && nkey[1])
+		*nkey = CTRL(nkey[1]);
+	for (unsigned int b = 0; b < LENGTH(bindings); b++) {
+		if (obindings[b].keys[ix_key] == curr_key)
+			bindings[b].keys[ix_key] = *nkey;
+	}
+}
+
+static int
+ini_handler(void *user, const char *section,
+		const char *name, const char *value) {
+
+	char *nmod = NULL;
+	if (strcmp(section,"main")==0) {
+		if (strcmp(name, "title")==0) {
+			title = malloc(strlen(value));
+			memcpy(title, value, strlen(value));
+		} else if (strcmp(name, "mod")==0) {
+			upd_char_bindings(0, MOD, value);
+		}
+	} else if (strcmp(section, "keys")==0) {
+		for (unsigned int b = 0; b < elen; b++) {
+			if (!strcmp(env_mods[b].name, name)) {
+				upd_char_bindings(1, env_mods[b].keyb, value);
+				break;
+			}
+		}
+	}
+}
+
 static void
 setup(void) {
 	char iniFileName[256];
@@ -944,18 +979,21 @@ setup(void) {
 	setlocale(LC_CTYPE, "");
 
 	// Read config file if present:
-	char *home_dir = NULL;
-	if ((home_dir = getenv("HOME") == NULL) {
-		if ((home_dir = getenv("APPDATA") == NULL) {
+	char *home_dir = getenv("HOME");
+	if (home_dir == NULL) {
+		home_dir = getenv("APPDATA");
+		if (home_dir == NULL) {
 			home_dir = "";
 		}
 	}
-	snprintf(iniFileName, 255, "%s/.dvtm-config.conf", home_dir);
-	if (access(iniFileName, R_OK)==0) {
-		printf("Config file found.\n");
-		if (ini_parse(iniFileName, ini_handler, NULL) < 0) {
-			fprintf(stderr, "Error reading config file.");
-			exit(1);
+	if (home_dir != NULL) {
+		snprintf(iniFileName, 255, "%s/.dvtm-config.conf", home_dir);
+		if (access(iniFileName, R_OK)==0) {
+			printf("Config file found.\n");
+			if (ini_parse(iniFileName, ini_handler, NULL) < 0) {
+				fprintf(stderr, "Error reading config file.");
+				exit(1);
+			}
 		}
 	}
 
@@ -1704,16 +1742,6 @@ usage(void) {
 	exit(EXIT_FAILURE);
 }
 
-void upd_bindings(int ix_key, char curr_key, char *skey) {
-	char *nkey = skey;
-	if (nkey[0] == '^' && nkey[1])
-		*nkey = CTRL(nkey[1]);
-	for (unsigned int b = 0; b < LENGTH(bindings); b++) {
-		if (obindings[b].keys[ix_key] == curr_key)
-			bindings[b].keys[ix_key] = *nkey;
-	}
-}
-
 static bool
 parse_args(int argc, char *argv[]) {
 	bool init = false;
@@ -1743,7 +1771,7 @@ parse_args(int argc, char *argv[]) {
 				mouse_events_enabled = !mouse_events_enabled;
 				break;
 			case 'm': {
-				upd_bindings(0, MOD, argv[++arg]);
+				upd_char_bindings(0, MOD, argv[++arg]);
 				break;
 			}
 			case 'd':
@@ -1780,13 +1808,12 @@ parse_args(int argc, char *argv[]) {
 
 void eval_envs() {
 	
-	int elen = sizeof(env_mods) / sizeof(struct env_mod_t);
 	for (int ic = 0 ; ic < elen ; ic++) {
 		char *nkb = getenv(env_mods[ic].envn);
 		if (nkb != NULL) {
-			upd_bindings(1, env_mods[ic].keyb, nkb);
+			upd_char_bindings(1, env_mods[ic].keyb, nkb);
 			if (!strcmp(env_mods[ic].envn, ZOOM_EVN)) {
-				upd_bindings(1, ZOOM2, nkb);
+				upd_char_bindings(1, ZOOM2, nkb);
 			}
 		}
 	}
