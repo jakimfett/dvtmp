@@ -34,14 +34,8 @@ sh_cmd() {
 }
 
 test_copymode() { # requires wget, diff, vis
-	dvtm_config_cmd 'c'
-	dvtm_config_cmd 'c'
-	dvtm_config_cmd 'c'
-	dvtm_config_cmd '1'
 	local FILENAME="UTF-8-demo.txt"
 	local COPY="$FILENAME.copy"
-	[ ! -e "$FILENAME" ] && (wget "$UTF8_TEST_URL" -O "$FILENAME" > /dev/null 2>&1 || return 1)
-	sleep 1
 	sh_cmd "cat $FILENAME"
 	dvtm_config_cmd 'e'
 	sleep 2
