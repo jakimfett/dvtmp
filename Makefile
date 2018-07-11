@@ -4,7 +4,7 @@ PKG_NAME = dvtm-config
 RPM_DIRS = BUILD RPMS SOURCES SPECS SRPMS
 
 SRC = dvtm-config.c vt.c ini.c
-DIST_FILES = LICENSE Makefile README.md testsuite.sh config.def.h config.mk \
+DIST_FILES = LICENSE Makefile README.md testsuite.py test-bashrc testsuite.sh config.def.h config.mk \
 		vt.h forkpty-aix.c forkpty-sunos.c tile.c bstack.c \
 		ini.h tstack.c vstack.c grid.c fullscreen.c fibonacci.c \
 		dvtm-config-status dvtm-config.info dvtm-config.1
