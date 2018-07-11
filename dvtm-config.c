@@ -177,7 +177,7 @@ typedef struct {
 #else
  #define debug eprint
 #endif
-
+#define TITLE_BUF_LEN 1024
 /* commands for use by keybindings */
 static void create(const char *args[]);
 static void copymode(const char *args[]);
@@ -429,6 +429,7 @@ static void
 draw_border(Client *c) {
 	char t = '\0';
 	int x, y, maxlen, attrs = NORMAL_ATTR;
+	char tbuf[TITLE_BUF_LEN + 1];
 
 	if (!show_border())
 		return;
@@ -440,6 +441,12 @@ draw_border(Client *c) {
 	wattrset(c->window, attrs);
 	getyx(c->window, y, x);
 	mvwhline(c->window, 0, 0, ACS_HLINE, c->w);
+	char *act_title = *c->title ? c->title : "";
+	char *act_sep = *c->title ? " | " : "";
+	snprintf(tbuf, TITLE_BUF_LEN, config.title_fmt, act_title, act_sep);
+	if (strlen(tbuf) > c->w) {
+		strncpy(tbuf, min
+
 	maxlen = c->w - 10;
 	if (maxlen < 0)
 		maxlen = 0;
@@ -938,7 +945,8 @@ getshell(void) {
 	return "/bin/sh";
 }
 
-void upd_char_bindings(int ix_key, char curr_key, const char *skey) {
+static void
+upd_char_bindings(int ix_key, char curr_key, const char *skey) {
 	char *nkey = strdup(skey);
 	if (nkey[0] == '^' && nkey[1])
 		*nkey = CTRL(nkey[1]);
@@ -946,6 +954,7 @@ void upd_char_bindings(int ix_key, char curr_key, const char *skey) {
 		if (obindings[b].keys[ix_key] == curr_key)
 			bindings[b].keys[ix_key] = *nkey;
 	}
+	free(nkey)
 }
 
 static int
@@ -971,32 +980,50 @@ ini_handler(void *user, const char *section,
 }
 
 static void
-setup(void) {
+proc_customization() {
 	char iniFileName[256];
 	FILE *iniFile;
-
-	shell = getshell();
-	setlocale(LC_CTYPE, "");
-
 	// Read config file if present:
 	char *home_dir = getenv("HOME");
+	char *subdir_dir = "";
 	if (home_dir == NULL) {
 		home_dir = getenv("APPDATA");
-		if (home_dir == NULL) {
-			home_dir = "";
+		if (home_dir != NULL) {
+			subdir_dir = strdup("dvtm-config/");
 		}
 	}
+	bool config_found = 0;
 	if (home_dir != NULL) {
-		snprintf(iniFileName, 255, "%s/.dvtm-config.conf", home_dir);
+		snprintf(iniFileName, 255, "%s%s/.dvtm-config.conf", home_dir, subdir_dir);
 		if (access(iniFileName, R_OK)==0) {
 			printf("Config file found.\n");
+			config_found = 0;
 			if (ini_parse(iniFileName, ini_handler, NULL) < 0) {
 				fprintf(stderr, "Error reading config file.");
 				exit(1);
 			}
 		}
 	}
+	if (strcmp(subdir_dir, "") {
+		free(subdir_dir);
+	}
+	if (!config_found) {
+		eval_envs();
+	}
+	if (obindings != NULL) {
+		free(obindings);
+		obindings = NULL;
+	}
 
+}
+
+static void
+setup(void) {
+
+	shell = getshell();
+	setlocale(LC_CTYPE, "");
+
+	proc_customization();
 
 	initscr();
 	start_color();
@@ -1827,6 +1854,7 @@ main(int argc, char *argv[]) {
 	memset(keys, 0, sizeof(keys));
 	sigset_t emptyset, blockset;
 
+	//This is freed in setup which is always called.
 	obindings = malloc(sizeof(bindings));
 	memcpy(obindings, bindings, sizeof(bindings));
 
@@ -1835,8 +1863,6 @@ main(int argc, char *argv[]) {
 		setup();
 		startup(NULL);
 	}
-	eval_envs();
-	free(obindings);
 
 	sigemptyset(&emptyset);
 	sigemptyset(&blockset);
