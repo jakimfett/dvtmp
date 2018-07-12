@@ -167,6 +167,20 @@ typedef struct {
 	bool color;
 } Editor;
 
+/*
+ * Structure containing main configuration loaded from config file.
+ */
+typedef struct {
+	char separator[256];
+	char title_fmt[256];
+} Configuration;
+
+struct env_mod_t {
+	const char *name;
+	char keyb;
+	const char *envn;
+};
+
 #define LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
 #define MAX(x, y)   ((x) > (y) ? (x) : (y))
 #define MIN(x, y)   ((x) < (y) ? (x) : (y))
@@ -219,18 +233,14 @@ static void mouse_zoom(const char *args[]);
 static Client* nextvisible(Client *c);
 static void focus(Client *c);
 static void resize(Client *c, int x, int y, int w, int h);
+Configuration config;
 extern Screen screen;
 static unsigned int waw, wah, wax, way;
 static Client *clients = NULL;
-static char *title;
+static char *title = NULL;
 
 #include "config.h"
 
-struct env_mod_t {
-	const char *name;
-	char keyb;
-	const char *envn;
-};
 struct env_mod_t env_mods[] = {
 	{"create", CREATE, "DVTM_CONFIG_CREATE"},
 	{"create_cwd", CREATE_CWD, "DVTM_CONFIG_CREATE_CWD"},
@@ -262,7 +272,7 @@ struct env_mod_t env_mods[] = {
 	{"paste", PASTE, "DVTM_CONFIG_PASTE"},
 	{"view", VIEW, "DVTM_CONFIG_VIEW"}};
 
-int elen = sizeof(env_mods) / sizeof(struct env_mod_t);
+unsigned int elen = sizeof(env_mods) / sizeof(struct env_mod_t);
 
 KeyBinding *obindings;
 
@@ -283,6 +293,14 @@ static const char *shell;
 static Register copyreg;
 static volatile sig_atomic_t running = true;
 static bool runinall = false;
+#define countof(arr) (sizeof(arr) / sizeof((arr)[0]))
+#define sstrlen(str) (sizeof(str) - 1)
+#define max(x, y) ((x) > (y) ? (x) : (y))
+#define min(x, y) ((x) < (y) ? (x) : (y))
+
+#ifdef LOGNAME
+static FILE *logfn = NULL;
+#endif
 
 static void
 eprint(const char *errstr, ...) {
@@ -442,12 +460,23 @@ draw_border(Client *c) {
 	getyx(c->window, y, x);
 	mvwhline(c->window, 0, 0, ACS_HLINE, c->w);
 	char *act_title = *c->title ? c->title : "";
-	char *act_sep = *c->title ? " | " : "";
-	snprintf(tbuf, TITLE_BUF_LEN, config.title_fmt, act_title, act_sep);
+	char *act_sep = *c->title ? config.separator : "";
+	snprintf(tbuf, TITLE_BUF_LEN, config.title_fmt, act_title, act_sep, c->order);
+	#ifdef LOGNAME
+	fprintf(logfn, "tbuf =%ld,c-w=%d.\n", strlen(tbuf), c-w);
+	fflush(logfn);
 	if (strlen(tbuf) > c->w) {
-		strncpy(tbuf, min
+		fprintf(logfn, "tbuf too big.\n");
+		fflush(logfn);
+	}
+	#endif
 
 	maxlen = c->w - 10;
+	#ifdef LOGNAME
+	fprintf(logfn, "c->order=%d,c->w=%d, sizeof(c->title)=%ld,strlen(tbuf)=%ld,maxlen=%d,act_title=%s,act_sep=%s\n", 
+		c->order, c->w, sizeof(c->title), strlen(tbuf), maxlen, act_title, act_sep);
+	fflush(logfn);
+	#endif
 	if (maxlen < 0)
 		maxlen = 0;
 	if ((size_t)maxlen < sizeof(c->title)) {
@@ -455,9 +484,9 @@ draw_border(Client *c) {
 		c->title[maxlen] = '\0';
 	}
 
-	mvwprintw(c->window, 0, 2, "[%s%s#%d]",
+	mvwprintw(c->window, 0, 2, config.title_fmt,
 	          *c->title ? c->title : "",
-	          *c->title ? " | " : "",
+	          act_sep,
 	          c->order);
 	if (t)
 		c->title[maxlen] = t;
@@ -946,7 +975,7 @@ getshell(void) {
 }
 
 static void
-upd_char_bindings(int ix_key, char curr_key, const char *skey) {
+upd_char_bindings(int ix_key, unsigned char curr_key, const char *skey) {
 	char *nkey = strdup(skey);
 	if (nkey[0] == '^' && nkey[1])
 		*nkey = CTRL(nkey[1]);
@@ -954,18 +983,34 @@ upd_char_bindings(int ix_key, char curr_key, const char *skey) {
 		if (obindings[b].keys[ix_key] == curr_key)
 			bindings[b].keys[ix_key] = *nkey;
 	}
-	free(nkey)
+	free(nkey);
+}
+
+static void
+ini_strncpy(char *dest, const char *src, unsigned int len) {
+	if (strlen(src)>1 && strlen(src)<len && src[0]=='"' && src[strlen(src)-1]=='"')
+		strncpy(dest, src+1, strlen(src)-2);
+	else
+		strncpy(dest, src, len);
+}
+
+static void
+ini_load_defaults() {
+	ini_strncpy(config.separator, SEPARATOR, 255);
+	ini_strncpy(config.title_fmt, TITLE_FMT, 255);
 }
 
 static int
 ini_handler(void *user, const char *section,
 		const char *name, const char *value) {
 
-	char *nmod = NULL;
 	if (strcmp(section,"main")==0) {
-		if (strcmp(name, "title")==0) {
-			title = malloc(strlen(value));
-			memcpy(title, value, strlen(value));
+		if (strcmp(name, "title_fmt")==0) {
+			ini_strncpy(config.title_fmt, value, 255);
+		} else if (strcmp(name, "history")==0) {
+			screen.history = value;
+		} else if (strcmp(name, "separator")==0) {
+			ini_strncpy(config.separator, value, 255);
 		} else if (strcmp(name, "mod")==0) {
 			upd_char_bindings(0, MOD, value);
 		}
@@ -977,20 +1022,40 @@ ini_handler(void *user, const char *section,
 			}
 		}
 	}
+	return 0;
+}
+
+void eval_envs(void) {
+	
+	for (unsigned int ic = 0 ; ic < elen ; ic++) {
+		char *nkb = getenv(env_mods[ic].envn);
+		if (nkb != NULL) {
+			upd_char_bindings(1, env_mods[ic].keyb, nkb);
+			if (!strcmp(env_mods[ic].envn, ZOOM_EVN)) {
+				upd_char_bindings(1, ZOOM2, nkb);
+			}
+		}
+	}
+	
 }
 
 static void
-proc_customization() {
+proc_customization(void) {
 	char iniFileName[256];
-	FILE *iniFile;
+
+	// Load default configration from config.h definitions:
+	ini_load_defaults();
+	
 	// Read config file if present:
 	char *home_dir = getenv("HOME");
-	char *subdir_dir = "";
+	char subdir_dir[256];
 	if (home_dir == NULL) {
 		home_dir = getenv("APPDATA");
 		if (home_dir != NULL) {
-			subdir_dir = strdup("dvtm-config/");
+			strncpy(subdir_dir, "dvtm-config/", 255);
 		}
+	} else {
+		subdir_dir[0] = '\0';
 	}
 	bool config_found = 0;
 	if (home_dir != NULL) {
@@ -1003,9 +1068,6 @@ proc_customization() {
 				exit(1);
 			}
 		}
-	}
-	if (strcmp(subdir_dir, "") {
-		free(subdir_dir);
 	}
 	if (!config_found) {
 		eval_envs();
@@ -1833,20 +1895,6 @@ parse_args(int argc, char *argv[]) {
 	return init;
 }
 
-void eval_envs() {
-	
-	for (int ic = 0 ; ic < elen ; ic++) {
-		char *nkb = getenv(env_mods[ic].envn);
-		if (nkb != NULL) {
-			upd_char_bindings(1, env_mods[ic].keyb, nkb);
-			if (!strcmp(env_mods[ic].envn, ZOOM_EVN)) {
-				upd_char_bindings(1, ZOOM2, nkb);
-			}
-		}
-	}
-	
-}
-
 int
 main(int argc, char *argv[]) {
 	KeyCombo keys;
@@ -1857,6 +1905,12 @@ main(int argc, char *argv[]) {
 	//This is freed in setup which is always called.
 	obindings = malloc(sizeof(bindings));
 	memcpy(obindings, bindings, sizeof(bindings));
+	#ifdef LOGNAME
+	logfn = fopen(LOGNAME, "w");
+	printf("Opening %s\n", LOGNAME);
+	fprintf(logfn, "bindings size %ld\n", sizeof(bindings));
+	fflush(logfn);
+	#endif
 
 	setenv("DVTM_CONFIG", VERSION, 1);
 	if (!parse_args(argc, argv)) {
@@ -1976,5 +2030,10 @@ main(int argc, char *argv[]) {
 	}
 
 	cleanup();
+	#ifdef LOGNAME
+	if (logfn != NULL) {
+		fclose(logfn);
+	}
+	#endif
 	return 0;
 }

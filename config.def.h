@@ -41,6 +41,12 @@ static Color colors[] = {
 #define MFACT 0.5
 /* number of clients in master area */
 #define NMASTER 1
+/* separator between window title and window number */
+#define SEPARATOR " | "
+/* printf format string for the window title, first %s
+ * is replaced by the title, second %s is replaced by
+ * the SEPARATOR, %d stands for the window number */
+#define TITLE_FMT "[%s%s#%d]"
 /* scroll back buffer size in lines */
 #define SCROLL_HISTORY 500
 /* printf format string for the tag in the status bar */

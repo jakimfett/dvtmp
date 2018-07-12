@@ -1,5 +1,11 @@
 include config.mk
 PKG_NAME = dvtm-config
+PGM_NAME = $(PKG_NAME)
+ifeq (${LOGNAME},)
+LOG_DEBUG_FLAGS = ${DEBUG_CFLAGS}
+else
+LOG_DEBUG_FLAGS = ${DEBUG_CFLAGS} -DLOGNAME="\"${LOGNAME}\""
+endif
 
 RPM_DIRS = BUILD RPMS SOURCES SPECS SRPMS
 
@@ -32,14 +38,16 @@ dvtm-config: ${OBJ}
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
 
 debug: clean
-	@make CFLAGS='${DEBUG_CFLAGS}'
+	@echo "CFLAGS   = ${LOG_DEBUG_FLAGS}"
+	@echo "LDFLAGS  = ${LDFLAGS}"
+	@make CFLAGS='${LOG_DEBUG_FLAGS}'
 
 clean-rpm:
 	@rm -rf $(RPM_DIRS)
 
 clean:
 	@echo cleaning
-	@rm -f dvtm-config ${OBJ} $(PKG_NAME)-${VERSION}.tar.gz
+	@rm -f $(PGM_NAME) ${OBJ} $(PKG_NAME)-${VERSION}.tar.gz
 	@rm -rf $(RPM_DIRS)
 
 dist: clean
@@ -68,11 +76,11 @@ dist-rpm: clean $(RPM_DIRS)/
 
 install: dvtm-config
 	@echo stripping executable
-	@${STRIP} dvtm-config
+	@${STRIP} $(PGM_NAME)
 	@echo installing executable file to ${DESTDIR}${PREFIX}/bin
 	@mkdir -p ${DESTDIR}${PREFIX}/bin
-	@cp -f dvtm-config ${DESTDIR}${PREFIX}/bin
-	@chmod 755 ${DESTDIR}${PREFIX}/bin/dvtm-config
+	@cp -f $(PGM_NAME) ${DESTDIR}${PREFIX}/bin
+	@chmod 755 ${DESTDIR}${PREFIX}/bin/$(PGM_NAME)
 	@cp -f dvtm-config-status ${DESTDIR}${PREFIX}/bin
 	@chmod 755 ${DESTDIR}${PREFIX}/bin/dvtm-config-status
 	@echo installing manual page to ${DESTDIR}${MANPREFIX}/man1
@@ -84,7 +92,7 @@ install: dvtm-config
 
 uninstall:
 	@echo removing executable file from ${DESTDIR}${PREFIX}/bin
-	@rm -f ${DESTDIR}${PREFIX}/bin/dvtm-config
+	@rm -f ${DESTDIR}${PREFIX}/bin/$(PGM_NAME)
 	@rm -f ${DESTDIR}${PREFIX}/bin/dvtm-config-status
 	@echo removing manual page from ${DESTDIR}${MANPREFIX}/man1
 	@rm -f ${DESTDIR}${MANPREFIX}/man1/dvtm-config.1
