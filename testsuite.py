@@ -7,13 +7,13 @@ from os.path import join, isdir, isfile, dirname
 import pexpect
 
 MDEF_MOD = "^G"
-MPGM = "./dvtm-config"
+MPGM = "./dvtm-plus"
 MESC = '^['
-os.environ["DVTM_CONFIG"] = MPGM
+os.environ["DVTM_PLUS"] = MPGM
 MTEST_PS1='test-prompt:'
 MEDITOR  = "vis"
-os.environ["DVTM_CONFIG_EDITOR"] = MEDITOR
-MLOG ="dvtm-config.log"
+os.environ["DVTM_PLUS_EDITOR"] = MEDITOR
+MLOG ="dvtm-plus.log"
 MSHELL = "bash"
 MDVTM_TEST_CMD = "%s '%s --init-file ./test-bashrc'" % (MPGM, MSHELL)
 MTEST_LOG = "$0.log"

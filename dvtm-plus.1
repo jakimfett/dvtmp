@@ -1,9 +1,9 @@
-.TH DVTM_CONFIG 1 dvtm-config\-VERSION
+.TH DVTM_PLUS 1 dvtm-plus\-VERSION
 .nh
 .SH NAME
-dvtm-config \- dynamic virtual terminal manager which is configurable
+dvtm-plus \- dynamic virtual terminal manager which is configurable
 .SH SYNOPSIS
-.B dvtm-config
+.B dvtm-plus
 .RB [ \-v ]
 .RB [ \-M ]
 .RB [ \-m
@@ -14,13 +14,15 @@ dvtm-config \- dynamic virtual terminal manager which is configurable
 .IR lines ]
 .RB [ \-t
 .IR title ]
+.RB [ \-g
+.IR Choose algorithm for setting the title. FIX DESCRIPTION ]
 .RB [ \-s
 .IR status-fifo ]
 .RB [ \-c
 .IR cmd-fifo ]
 .RI [ command \ ... "" ]
 .SH DESCRIPTION
-dvtm-config is a dynamic tiling window manager which is configurable for the console.
+dvtm-plus is a dynamic tiling window manager which is configurable for the console.
 As a console window manager it tries to make it easy to work with multiple
 console based applications.
 .SH OPTIONS
@@ -51,7 +53,7 @@ and don't change it to the one of the currently focused window.
 Open or create the named pipe
 .I status-fifo
 read its content and display it in the statusbar. See the
-.I dvtm-config-status
+.I dvtm-plus-status
 script for an usage example.
 .TP
 .BI \-c \ cmd-fifo
@@ -77,49 +79,49 @@ or with the
 command line option.
 .TP
 .B Mod\-c
-Create a new shell window. Change with DVTM_CONFIG_CREATE environment
+Create a new shell window. Change with DVTM_PLUS_CREATE environment
 variable.
 .TP
 .B Mod\-C
 Create a new shell window using the current working directory of the
-focused window. Change with DVTM_CONFIG_CREATE_CWD environment variable.
+focused window. Change with DVTM_PLUS_CREATE_CWD environment variable.
 .TP
 .B Mod\-x\-x
-Close focused window. Change with the DVTM_CONFIG_KILL_CLIENT
+Close focused window. Change with the DVTM_PLUS_KILL_CLIENT
 environment variable.
 .TP
 .B Mod\-l
 Increases the master area width about 5% (all except grid and 
-fullscreen layout). Change with the DVTM_CONFIG_MASTER_DECR environment
+fullscreen layout). Change with the DVTM_PLUS_MASTER_DECR environment
 variable.
 .TP
 .B Mod\-h
 Decreases the master area width about 5% (all except grid and
-fullscreen layout). Change with the DVTM_CONFIG_MASTER_INCR environment
+fullscreen layout). Change with the DVTM_PLUS_MASTER_INCR environment
 variable.
 .TP
 .B Mod\-i
 Increase number of windows displayed in the master area. Change with
-the DVTM_CONFIG_INCR_WINDOWS environment variable.
+the DVTM_PLUS_INCR_WINDOWS environment variable.
 .TP
 .B Mod\-d
 Decrease number of windows displayed in the master area. Change with
-the DVTM_CONFIG_DECR_WINDOWS environment variable.
+the DVTM_PLUS_DECR_WINDOWS environment variable.
 .TP
 .B Mod\-j
-Focus next window. Change with the DVTM_CONFIG_FOCUS_NEXT environment
+Focus next window. Change with the DVTM_PLUS_FOCUS_NEXT environment
 variable.
 .TP
 .B Mod\-k
-Focus previous window. Change with the DVTM_CONFIG_FOCUS_PREV environment
+Focus previous window. Change with the DVTM_PLUS_FOCUS_PREV environment
 variable.
 .TP
 .B Mod\-J
-Focus next non minimized window. Change with the DVTM_CONFIG_FOCUS_NEXT_MIN
+Focus next non minimized window. Change with the DVTM_PLUS_FOCUS_NEXT_MIN
 environment variable.
 .TP
 .B Mod\-K
-Focus previous non minimized window. Change with the DVTM_CONFIG_FOCUS_PREV_MINV
+Focus previous non minimized window. Change with the DVTM_PLUS_FOCUS_PREV_MINV
 environment variable.
 .TP
 .BI Mod\- n
@@ -128,7 +130,7 @@ Focus the
 window.
 .TP
 .B Mod\-Tab
-Focus previously selected window. Change with the DVTM_CONFIG_FOCUS_PREV_WINDOW
+Focus previously selected window. Change with the DVTM_PLUS_FOCUS_PREV_WINDOW
 environment variable.
 .TP
 .B Mod\-.
@@ -136,7 +138,7 @@ Toggle minimization of current window.
 .TP
 .B Mod\-m
 Maximize current window (change to fullscreen layout). Change with the 
-DVTM_CONFIG_MAX_WINDOW environment variable.
+DVTM_PLUS_MAX_WINDOW environment variable.
 .TP
 .B Shift\-PageUp
 .TQ
@@ -150,59 +152,59 @@ Scroll down.
 .TP
 .B Mod\-Space
 Toggle between defined layouts (affects all windows). Change with the
-DVTM_CONFIG_TOGGLE_LAYOUTS environment variable.
+DVTM_PLUS_TOGGLE_LAYOUTS environment variable.
 .TP
 .B Mod\-Enter
 Zooms/cycles current window to/from master area. Change with the
-DVTM_CONFIG_ZOOM environment variable.
+DVTM_PLUS_ZOOM environment variable.
 .TP
 .B Mod\-f
 Change to vertical stack tiling layout. Change with the
-DVTM_CONFIG_TILE_VERTICAL environment variable.
+DVTM_PLUS_TILE_VERTICAL environment variable.
 .TP
 .B Mod\-b
-Change to bottom stack tiling layout. Change with the DVTM_CONFIG_TILE_BOTTOM
+Change to bottom stack tiling layout. Change with the DVTM_PLUS_TILE_BOTTOM
 environment variable.
 .TP
 .B Mod\-g
-Change to grid layout. Change with the DVTM_CONFIG_TILE_GRID environment
+Change to grid layout. Change with the DVTM_PLUS_TILE_GRID environment
 variable.
 .TP
 .B Mod\-s
-Show/hide the status bar. Change with the DVTM_CONFIG_SHOW_HIDE_STATUS
+Show/hide the status bar. Change with the DVTM_PLUS_SHOW_HIDE_STATUS
 environment variable.
 .TP
 .B Mod\-S
 Toggle position of the status bar between top and bottom. Change with the
-DVTM_CONFIG_TOGGLE_STATUS_LOC environment variable.
+DVTM_PLUS_TOGGLE_STATUS_LOC environment variable.
 .TP
 .B Mod\-r
 .TQ
 .B Mod\-^L
-Redraw whole screen.  Change control mod L with the DVTM_CONFIG_REDRAW1
-environment variable. Change the Mod with r with the DVTM_CONFIG_REDRAW2
+Redraw whole screen.  Change control mod L with the DVTM_PLUS_REDRAW1
+environment variable. Change the Mod with r with the DVTM_PLUS_REDRAW2
 environment variable.
 .TP
 .B Mod\-a
 Toggle keyboard multiplexing mode, if activated keypresses are sent to all
-visible windows. Change with the DVTM_CONFIG_MULTIPLEX_TOGGLE environment
+visible windows. Change with the DVTM_PLUS_MULTIPLEX_TOGGLE environment
 variable.
 .TP
 .B Mod\-M
-Toggle dvtm-config mouse grabbing. Change with the DVTM_CONFIG_TOGGLE_MOUSE
+Toggle dvtm-plus mouse grabbing. Change with the DVTM_PLUS_TOGGLE_MOUSE
 environment variable.
 .TP
 .B Mod\-e
 Enter copy mode (see section below for further information). Change with
-the DVTM_CONFIG_COPY_MODE1 environment variable.
+the DVTM_PLUS_COPY_MODE1 environment variable.
 .TP
 .B Mod\-/
 Enter copy mode and start searching forward (assumes a vi-like editor).
-Change with the DVTM_CONFIG_COPY_MODE2 environment variable.
+Change with the DVTM_PLUS_COPY_MODE2 environment variable.
 .TP
 .B Mod\-p
 Paste last copied text from copy mode at current cursor position. Change
-with the DVTM_CONFIG_PASTE environment variable.
+with the DVTM_PLUS_PASTE environment variable.
 .TP
 .B Mod\-?
 Show this manual page.
@@ -231,16 +233,16 @@ Apply nth tag to focused window.
 Add/remove nth tag to/from focused window.
 .TP
 .B Mod\-q\-q
-Quit dvtm-config.
+Quit dvtm-plus.
 .SS Mouse commands
 .TP
 .B Copy and Paste
-By default dvtm-config captures mouse events to provide the actions listed below.
+By default dvtm-plus captures mouse events to provide the actions listed below.
 Unfortunately this interferes with the standard X copy and paste mechanism.
 To work around this you need to hold down
 .B Shift
 while selecting or pasting text.
-Alternatively you can disable mouse support at compile time, start dvtm-config with the
+Alternatively you can disable mouse support at compile time, start dvtm-plus with the
 .B -M
 flag or toggle mouse support during runtime with
 .BR Mod\-M .
@@ -264,33 +266,33 @@ register and can be pasted into other clients (via
 )
 .SH ENVIRONMENT VARIABLES
 .TP
-.B DVTM_CONFIG
-Each process spawned by dvtm-config will have this variable set to the dvtm-config version
+.B DVTM_PLUS
+Each process spawned by dvtm-plus will have this variable set to the dvtm-plus version
 it is running under.
 .TP
-.B DVTM_CONFIG_WINDOW_ID
+.B DVTM_PLUS_WINDOW_ID
 Each process also has access to its constant and unique window id.
 .TP
-.B DVTM_CONFIG_CMD_FIFO
-If the -c command line argument was specified upon dvtm-config startup, this variable
+.B DVTM_PLUS_CMD_FIFO
+If the -c command line argument was specified upon dvtm-plus startup, this variable
 will be set to the file name of the named pipe. Thus allowing the process
-to send commands back to dvtm-config.
+to send commands back to dvtm-plus.
 .TP
-.B DVTM_CONFIG_TERM
-By default dvtm-config uses its own terminfo file and therefore sets
-.BR TERM=dvtm-config
+.B DVTM_PLUS_TERM
+By default dvtm-plus uses its own terminfo file and therefore sets
+.BR TERM=dvtm-plus
 within the client windows. This can be overridden by setting the
-.BR DVTM_CONFIG_TERM
-environment variable to a valid terminal name before launching dvtm-config.
+.BR DVTM_PLUS_TERM
+environment variable to a valid terminal name before launching dvtm-plus.
 .TP
-.B DVTM_CONFIG_EDITOR
-When entering the copymode dvtm-config pipes the whole scroll back buffer to
-.BR DVTM_CONFIG_EDITOR
+.B DVTM_PLUS_EDITOR
+When entering the copymode dvtm-plus pipes the whole scroll back buffer to
+.BR DVTM_PLUS_EDITOR
 which is launched with
 .BR \-
 (indicating to read from stdin) as its only argument.
 If
-.BR DVTM_CONFIG_EDITOR
+.BR DVTM_PLUS_EDITOR
 is not set
 .BR EDITOR
 is checked, if this is also not set the default value specified in
@@ -298,13 +300,13 @@ is checked, if this is also not set the default value specified in
 is used instead.
 .SH EXAMPLE
 See the
-.I dvtm-config-status
+.I dvtm-plus-status
 script as an example of how to display text in the
 status bar.
 .SH CUSTOMIZATION
-dvtm-config is customized by creating a custom
+dvtm-plus is customized by creating a custom
 .I config.h
 and (re)compiling the source code.
 This keeps it fast, secure and simple.
 .SH AUTHOR
-dvtm-config is written by Marc André Tanner <mat at brain-dump.org>
+dvtm-plus is written by Marc André Tanner <mat at brain-dump.org>

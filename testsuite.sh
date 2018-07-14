@@ -3,8 +3,8 @@
 
 MOD="" # CTRL+g
 ESC="" # \e
-DVTM_CONFIG="./dvtm-config"
-export DVTM_CONFIG_EDITOR="vis"
+DVTM_PLUS="./dvtm-config"
+export DVTM_PLUS_EDITOR="vis"
 LOG="dvtm-config.log"
 TEST_LOG="$0.log"
 UTF8_TEST_FN="UTF-8-demo.txt"
@@ -16,8 +16,8 @@ if [ "$1" = "--debug" ] ; then
 else
 	keep_log=0
 fi
-[ ! -z "$1" ] && DVTM_CONFIG="$1"
-[ ! -x "$DVTM_CONFIG" ] && echo "usage: [--debug] $0 path-to-dvtm-config-binary" && exit 1
+[ ! -z "$1" ] && DVTM_PLUS="$1"
+[ ! -x "$DVTM_PLUS" ] && echo "usage: [--debug] $0 path-to-dvtm-config-binary" && exit 1
 
 dvtm_config_input() {
 	printf "$1"
@@ -48,9 +48,8 @@ test_copymode() { # requires wget, diff, vis
 	dvtm_config_input ":"
 	dvtm_config_input "wq!\n"
 	sleep 2
+	dvtm_config_cmd '2'
 	sh_cmd "cat <<'EOF' > $COPY"
-	dvtm_config_cmd 'p'
-	sleep 2
 	while [ ! -r "$COPY" ]; do sleep 1; done;
 	dvtm_config_input "exit\n"
 	diff -u "$FILENAME" "$COPY" 1>&2
@@ -65,10 +64,10 @@ if ! which vis > /dev/null 2>&1 ; then
 fi
 
 {
-	echo "Testing $DVTM_CONFIG" 1>&2
-	$DVTM_CONFIG -v 1>&2
+	echo "Testing $DVTM_PLUS" 1>&2
+	$DVTM_PLUS -v 1>&2
 	test_copymode && echo "copymode: OK" 1>&2 || echo "copymode: FAIL" 1>&2;
-} 2> "$TEST_LOG" | $DVTM_CONFIG -m ^g 2> $LOG
+} 2> "$TEST_LOG" | $DVTM_PLUS -m ^g 2> $LOG
 
 cat "$TEST_LOG"
 if [ $? -eq 0 -a $keep_log -eq 0 ] ; then

@@ -1,15 +1,19 @@
-# dvtm - dynamic virtual terminal manager
+# dvtm-plus - dynamic virtual terminal manager configurable by an ini file.
 
+This program is modifed from 
 [dvtm](http://www.brain-dump.org/projects/dvtm/) brings the concept
 of tiling window management, popularized by X11-window managers like
 [dwm](http://dwm.suckless.org) to the console. As a console window
 manager it tries to make it easy to work with multiple console based
-programs.
+programs. This takes some of the modifications from [dvtm](https://github.com/tgvaughan/dvtm).
+See the man page.
 
 ![abduco+dvtm demo](https://raw.githubusercontent.com/martanne/dvtm/gh-pages/screencast.gif)
 
 ## News
 
+- [dvtm-0.15](http://www.brain-dump.org/projects/dvtm/dvtm-0.15.tar.gz)
+  [released](http://www.brain-dump.org/projects/dvtm/dvtm-0.15.tar.gz) (09.01.2016)
 - [dvtm-0.14](http://www.brain-dump.org/projects/dvtm/dvtm-0.14.tar.gz)
   [released](http://lists.suckless.org/dev/1502/25558.html) (19.02.2015)
 - [dvtm-0.13](http://www.brain-dump.org/projects/dvtm/dvtm-0.13.tar.gz)
@@ -228,10 +232,10 @@ There are some pre defined macros to ease configuration.
 
 This means you haven't installed the `dvtm.info` terminfo description
 which can be done with `tic -s dvtm.info`. If for some reason you
-can't install new terminfo descriptions set the `DVTM_CONFIG_TERM` environment
+can't install new terminfo descriptions set the `DVTM_PLUS_TERM` environment
 variable to a known terminal when starting `dvtm` as in
 
-    $ DVTM_CONFIG_TERM=rxvt dvtm
+    $ DVTM_PLUS_TERM=rxvt dvtm
 
 This will instruct dvtm to use rxvt as `$TERM` value within its windows.
 

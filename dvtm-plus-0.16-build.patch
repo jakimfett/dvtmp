@@ -1,0 +1,33 @@
+diff -ur ./config.mk ../b/config.mk
+--- ./config.mk	2018-07-14 02:11:35.446279484 -0500
++++ ../b/config.mk	2018-07-14 02:12:55.104263029 -0500
+@@ -12,8 +12,8 @@
+ INCS = -I.
+ LIBS = -lc -lutil -lncursesw
+ CPPFLAGS = -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700 -D_XOPEN_SOURCE_EXTENDED
+-CFLAGS += -std=c99 ${INCS} -DVERSION=\"${VERSION}\" -DNDEBUG ${CPPFLAGS}
+-LDFLAGS += ${LIBS}
++CFLAGS += -std=c99 ${INCS} -DVERSION=\"${VERSION}\" -DNDEBUG ${CPPFLAGS} ${RPM_OPT_FLAGS}
++LDFLAGS += ${LIBS} -znow
+ 
+ DEBUG_CFLAGS = ${CFLAGS} -UNDEBUG -O0 -g -ggdb -Wall -Wextra -Wno-unused-parameter
+ 
+diff -ur ./Makefile ../b/Makefile
+--- ./Makefile	2018-07-14 02:11:28.405192547 -0500
++++ ../b/Makefile	2018-07-14 02:15:38.794284123 -0500
+@@ -75,13 +75,11 @@
+ 	@rpmbuild -v -bb --clean ~/rpmbuild/SPECS/$(PKG_NAME).spec
+ 
+ install: dvtm-plus
+-	@echo stripping executable
+-	@${STRIP} $(PGM_NAME)
+ 	@echo installing executable file to ${DESTDIR}${PREFIX}/bin
+ 	@mkdir -p ${DESTDIR}${PREFIX}/bin
+-	@cp -f $(PGM_NAME) ${DESTDIR}${PREFIX}/bin
++	@cp -pf $(PGM_NAME) ${DESTDIR}${PREFIX}/bin
+ 	@chmod 755 ${DESTDIR}${PREFIX}/bin/$(PGM_NAME)
+-	@cp -f $(PGM_NAME)-status ${DESTDIR}${PREFIX}/bin
++	@cp -pf $(PGM_NAME)-status ${DESTDIR}${PREFIX}/bin
+ 	@chmod 755 ${DESTDIR}${PREFIX}/bin/$(PGM_NAME)-status
+ 	@echo installing manual page to ${DESTDIR}${MANPREFIX}/man1
+ 	@mkdir -p ${DESTDIR}${MANPREFIX}/man1

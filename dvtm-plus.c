@@ -45,7 +45,7 @@ int ESCDELAY;
 # define set_escdelay(d) (ESCDELAY = (d))
 #endif
 
-#define ZOOM_EVN "DVTM_CONFIG_ZOOM"
+#define ZOOM_EVN "DVTM_PLUS_ZOOM"
 
 typedef struct {
 	float mfact;
@@ -170,16 +170,18 @@ typedef struct {
 /*
  * Structure containing main configuration loaded from config file.
  */
+typedef enum { ORIG_TITLE_ALGORITHM, INI_TGVAUGN, INI_SUPPOSITION} TitleAlgorithm;
 typedef struct {
 	char separator[256];
 	char title_fmt[256];
+	TitleAlgorithm title_alg;
 } Configuration;
 
-struct env_mod_t {
+typedef struct {
 	const char *name;
 	char keyb;
 	const char *envn;
-};
+} EnvMod;
 
 #define LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
 #define MAX(x, y)   ((x) > (y) ? (x) : (y))
@@ -241,43 +243,43 @@ static char *title = NULL;
 
 #include "config.h"
 
-struct env_mod_t env_mods[] = {
-	{"create", CREATE, "DVTM_CONFIG_CREATE"},
-	{"create_cwd", CREATE_CWD, "DVTM_CONFIG_CREATE_CWD"},
-	{"kill_client", KILL_CLIENT, "DVTM_CONFIG_KILL_CLIENT"},
-	{"focusnext", FOCUS_NEXT, "DVTM_CONFIG_FOCUS_NEXT"},
-	{"focusnextnm", FOCUS_NEXT_MIN, "DVTM_CONFIG_FOCUS_NEXT_MIN"},
-	{"focusprevnm", FOCUS_PREV_MIN, "DVTM_CONFIG_FOCUS_PREV_MINV"},
-	{"focusprev", FOCUS_PREV, "DVTM_CONFIG_FOCUS_PREV"},
-	{"setlayout_vertical", TILE_VERTICAL, "DVTM_CONFIG_TILE_VERTICAL"},
-	{"setlayout_grid", TILE_GRID, "DVTM_CONFIG_TILE_GRID"},
-	{"setlayout_bottom", TILE_BOTTOM, "DVTM_CONFIG_TILE_BOTTOM"},
-	{"max_window", MAX_WINDOW, "DVTM_CONFIG_MAX_WINDOW"},
-	{"toggle_layouts", TOGGLE_LAYOUTS, "DVTM_CONFIG_TOGGLE_LAYOUTS"},
-	{"incmaster", INCR_WINDOWS, "DVTM_CONFIG_INCR_WINDOWS"},
-	{"decrmaster", DECR_WINDOWS, "DVTM_CONFIG_DECR_WINDOWS"},
-	{"decr_master", MASTER_DECR, "DVTM_CONFIG_MASTER_DECR"},
-	{"incr_master", MASTER_INCR, "DVTM_CONFIG_MASTER_INCR"},
-	{"toggleminimize", TOGGLE_MIN, "DVTM_CONFIG_TOGGLE_MIN"},
-	{"togglebar", SHOW_HIDE_STATUS, "DVTM_CONFIG_SHOW_HIDE_STATUS"},
-	{"togglebarpos", TOGGLE_STATUS_LOC, "DVTM_CONFIG_TOGGLE_STATUS_LOC"},
-	{"togglemouse", TOGGLE_MOUSE, "DVTM_CONFIG_TOGGLE_MOUSE"},
-	{"zoom", ZOOM1, "DVTM_CONFIG_ZOOM"},
-	{"focuslast", FOCUS_PREV_WINDOW, "DVTM_CONFIG_FOCUS_PREV_WINDOW"},
-	{"toggler_multiplex", MULTIPLEX_TOGGLE, "DVTM_CONFIG_MULTIPLEX_TOGGLE"},
-	{"redraw1", REDRAW_CTL_L, "DVTM_CONFIG_REDRAW1"},
-	{"redraw2", REDRAW_R, "DVTM_CONFIG_REDRAW2"},
-	{"copymode1", COPY_MODE1, "DVTM_CONFIG_COPY_MODE1"},
-	{"copymode2", COPY_MODE2, "DVTM_CONFIG_COPY_MODE2"},
-	{"paste", PASTE, "DVTM_CONFIG_PASTE"},
-	{"view", VIEW, "DVTM_CONFIG_VIEW"}};
+EnvMod env_mods[] = {
+	{"create", CREATE, "DVTM_PLUS_CREATE"},
+	{"create_cwd", CREATE_CWD, "DVTM_PLUS_CREATE_CWD"},
+	{"kill_client", KILL_CLIENT, "DVTM_PLUS_KILL_CLIENT"},
+	{"focusnext", FOCUS_NEXT, "DVTM_PLUS_FOCUS_NEXT"},
+	{"focusnextnm", FOCUS_NEXT_MIN, "DVTM_PLUS_FOCUS_NEXT_MIN"},
+	{"focusprevnm", FOCUS_PREV_MIN, "DVTM_PLUS_FOCUS_PREV_MINV"},
+	{"focusprev", FOCUS_PREV, "DVTM_PLUS_FOCUS_PREV"},
+	{"setlayout_vertical", TILE_VERTICAL, "DVTM_PLUS_TILE_VERTICAL"},
+	{"setlayout_grid", TILE_GRID, "DVTM_PLUS_TILE_GRID"},
+	{"setlayout_bottom", TILE_BOTTOM, "DVTM_PLUS_TILE_BOTTOM"},
+	{"max_window", MAX_WINDOW, "DVTM_PLUS_MAX_WINDOW"},
+	{"toggle_layouts", TOGGLE_LAYOUTS, "DVTM_PLUS_TOGGLE_LAYOUTS"},
+	{"incmaster", INCR_WINDOWS, "DVTM_PLUS_INCR_WINDOWS"},
+	{"decrmaster", DECR_WINDOWS, "DVTM_PLUS_DECR_WINDOWS"},
+	{"decr_master", MASTER_DECR, "DVTM_PLUS_MASTER_DECR"},
+	{"incr_master", MASTER_INCR, "DVTM_PLUS_MASTER_INCR"},
+	{"toggleminimize", TOGGLE_MIN, "DVTM_PLUS_TOGGLE_MIN"},
+	{"togglebar", SHOW_HIDE_STATUS, "DVTM_PLUS_SHOW_HIDE_STATUS"},
+	{"togglebarpos", TOGGLE_STATUS_LOC, "DVTM_PLUS_TOGGLE_STATUS_LOC"},
+	{"togglemouse", TOGGLE_MOUSE, "DVTM_PLUS_TOGGLE_MOUSE"},
+	{"zoom", ZOOM1, "DVTM_PLUS_ZOOM"},
+	{"focuslast", FOCUS_PREV_WINDOW, "DVTM_PLUS_FOCUS_PREV_WINDOW"},
+	{"toggler_multiplex", MULTIPLEX_TOGGLE, "DVTM_PLUS_MULTIPLEX_TOGGLE"},
+	{"redraw1", REDRAW_CTL_L, "DVTM_PLUS_REDRAW1"},
+	{"redraw2", REDRAW_R, "DVTM_PLUS_REDRAW2"},
+	{"copymode1", COPY_MODE1, "DVTM_PLUS_COPY_MODE1"},
+	{"copymode2", COPY_MODE2, "DVTM_PLUS_COPY_MODE2"},
+	{"paste", PASTE, "DVTM_PLUS_PASTE"},
+	{"view", VIEW, "DVTM_PLUS_VIEW"}};
 
-unsigned int elen = sizeof(env_mods) / sizeof(struct env_mod_t);
+unsigned int elen = sizeof(env_mods) / sizeof(EnvMod);
 
 KeyBinding *obindings;
 
 /* global variables */
-static const char *dvtm_name = "dvtm-config";
+static const char *dvtm_name = "dvtm-plus";
 Screen screen = { .mfact = MFACT, .nmaster = NMASTER, .history = SCROLL_HISTORY };
 static Client *stack = NULL;
 static Client *sel = NULL;
@@ -471,7 +473,14 @@ draw_border(Client *c) {
 	}
 	#endif
 
-	maxlen = c->w - 10;
+	if (config.title_alg == INI_TGVAUGN) {
+		maxlen = c->w - (2 + strlen(config.title_fmt) - sstrlen("%s%sd")  + strlen(config.separator) + 2);
+	} else if (config.title_alg == ORIG_TITLE_ALGORITHM) {
+		maxlen = c->w - 10;
+	} else {
+		maxlen = c->w - strlen(tbuf);
+	}
+
 	#ifdef LOGNAME
 	fprintf(logfn, "c->order=%d,c->w=%d, sizeof(c->title)=%ld,strlen(tbuf)=%ld,maxlen=%d,act_title=%s,act_sep=%s\n", 
 		c->order, c->w, sizeof(c->title), strlen(tbuf), maxlen, act_title, act_sep);
@@ -998,6 +1007,7 @@ static void
 ini_load_defaults() {
 	ini_strncpy(config.separator, SEPARATOR, 255);
 	ini_strncpy(config.title_fmt, TITLE_FMT, 255);
+	config.title_alg = INI_TGVAUGN;
 }
 
 static int
@@ -1008,7 +1018,7 @@ ini_handler(void *user, const char *section,
 		if (strcmp(name, "title_fmt")==0) {
 			ini_strncpy(config.title_fmt, value, 255);
 		} else if (strcmp(name, "history")==0) {
-			screen.history = value;
+			screen.history = atoi(value);
 		} else if (strcmp(name, "separator")==0) {
 			ini_strncpy(config.separator, value, 255);
 		} else if (strcmp(name, "mod")==0) {
@@ -1052,14 +1062,14 @@ proc_customization(void) {
 	if (home_dir == NULL) {
 		home_dir = getenv("APPDATA");
 		if (home_dir != NULL) {
-			strncpy(subdir_dir, "dvtm-config/", 255);
+			strncpy(subdir_dir, "dvtm-plus/", 255);
 		}
 	} else {
 		subdir_dir[0] = '\0';
 	}
 	bool config_found = 0;
 	if (home_dir != NULL) {
-		snprintf(iniFileName, 255, "%s%s/.dvtm-config.conf", home_dir, subdir_dir);
+		snprintf(iniFileName, 255, "%s%s/.dvtm-plus.conf", home_dir, subdir_dir);
 		if (access(iniFileName, R_OK)==0) {
 			printf("Config file found.\n");
 			config_found = 0;
@@ -1180,7 +1190,7 @@ create(const char *args[]) {
 	const char *pargs[4] = { shell, NULL };
 	char buf[8], *cwd = NULL;
 	const char *env[] = {
-		"DVTM_CONFIG_WINDOW_ID", buf,
+		"DVTM_PLUS_WINDOW_ID", buf,
 		NULL
 	};
 
@@ -1236,7 +1246,7 @@ copymode(const char *args[]) {
 	if (!(sel->editor = vt_create(sel->h - sel->has_title_line, sel->w, 0)))
 		return;
 
-	char *ed = getenv("DVTM_CONFIG_EDITOR");
+	char *ed = getenv("DVTM_PLUS_EDITOR");
 	int *to = &sel->editor_fds[0], *from = NULL;
 	sel->editor_fds[0] = sel->editor_fds[1] = -1;
 
@@ -1826,8 +1836,8 @@ open_or_create_fifo(const char *name, const char **name_created) {
 static void
 usage(void) {
 	cleanup();
-	eprint("usage: dvtm-config [-v] [-M] [-m mod] [-d delay] [-h lines] [-t title] "
-	       "[-s status-fifo] [-c cmd-fifo] [cmd...]\n");
+	eprint("usage: dvtm-plus [-v] [-M] [-m mod] [-d delay] [-h lines] [-t title] "
+	       "[-g 0 throug 2] [-s status-fifo] [-c cmd-fifo] [cmd...]\n");
 	exit(EXIT_FAILURE);
 }
 
@@ -1854,7 +1864,7 @@ parse_args(int argc, char *argv[]) {
 			usage();
 		switch (argv[arg][1]) {
 			case 'v':
-				puts("dvtm-config-"VERSION" © 2007-2016 Marc André Tanner");
+				puts("dvtm-plus-"VERSION" © 2007-2016 Marc André Tanner");
 				exit(EXIT_SUCCESS);
 			case 'M':
 				mouse_events_enabled = !mouse_events_enabled;
@@ -1873,6 +1883,21 @@ parse_args(int argc, char *argv[]) {
 			case 'h':
 				screen.history = atoi(argv[++arg]);
 				break;
+			case 'g':
+				{
+					int alg = atoi(argv[++arg]);
+					switch(alg) {
+						case 0:
+							config.title_alg = ORIG_TITLE_ALGORITHM;
+						case 1:
+							config.title_alg = INI_TGVAUGN;
+						case 2:
+							config.title_alg = INI_SUPPOSITION;
+						default:
+							usage();
+					}
+				}
+				break;
 			case 't':
 				title = argv[++arg];
 				break;
@@ -1885,7 +1910,7 @@ parse_args(int argc, char *argv[]) {
 				cmdfifo.fd = open_or_create_fifo(argv[++arg], &cmdfifo.file);
 				if (!(fifo = realpath(argv[arg], NULL)))
 					error("%s\n", strerror(errno));
-				setenv("DVTM_CONFIG_CMD_FIFO", fifo, 1);
+				setenv("DVTM_PLUS_CMD_FIFO", fifo, 1);
 				break;
 			}
 			default:
@@ -1912,7 +1937,7 @@ main(int argc, char *argv[]) {
 	fflush(logfn);
 	#endif
 
-	setenv("DVTM_CONFIG", VERSION, 1);
+	setenv("DVTM_PLUS", VERSION, 1);
 	if (!parse_args(argc, argv)) {
 		setup();
 		startup(NULL);
