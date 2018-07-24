@@ -10,7 +10,7 @@ endif
 RPM_DIRS = BUILD BUILDROOT RPMS SOURCES SPECS SRPMS
 
 SRC = dvtm-plus.c vt.c ini.c
-DIST_FILES = LICENSE Makefile README.md testsuite.py test-bashrc testsuite.sh config.def.h config.mk \
+DIST_FILES = LICENSE Makefile README.md test-bashrc testsuite.sh config.def.h config.mk \
 		vt.h forkpty-aix.c forkpty-sunos.c tile.c bstack.c \
 		ini.h tstack.c vstack.c grid.c fullscreen.c fibonacci.c \
 		$(PGM_NAME)-status $(PGM_NAME).info $(PGM_NAME).1
@@ -55,14 +55,12 @@ dist: clean
 	@gzip $(PKG_NAME)-${VERSION}.tar
 	@rm -rf $(PKG_NAME)-${VERSION}
 
-$(RPM_DIRS)/:
-	@mkdir -p ~/rpmbuild/$@
-
-dist-rpm: clean $(RPM_DIRS)/ dist
+dist-rpm: clean dist
+	@rpmdev-setuptree
 	@mv $(PKG_NAME)-${VERSION}.tar.gz ~/rpmbuild/SOURCES/
 	@cp $(PKG_NAME).spec ~/rpmbuild/SPECS
 	@cp dvtm-plus-0.16-build.patch  ~/rpmbuild/SOURCES
-	@rpmbuild -v -bb --clean ~/rpmbuild/SPECS/$(PKG_NAME).spec
+	@rpmbuild -v -ba --clean ~/rpmbuild/SPECS/$(PKG_NAME).spec
 
 install: dvtm-plus
 	@echo stripping executable

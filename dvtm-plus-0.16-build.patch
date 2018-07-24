@@ -16,7 +16,7 @@ diff -ur ./Makefile ../b/Makefile
 --- ./Makefile	2018-07-14 02:11:28.405192547 -0500
 +++ ../b/Makefile	2018-07-14 02:15:38.794284123 -0500
 @@ -75,13 +75,11 @@
- 	@rpmbuild -v -bb --clean ~/rpmbuild/SPECS/$(PKG_NAME).spec
+ 	@rpmbuild -v -ba --clean ~/rpmbuild/SPECS/$(PKG_NAME).spec
  
  install: dvtm-plus
 -	@echo stripping executable

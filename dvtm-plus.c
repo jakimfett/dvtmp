@@ -465,7 +465,7 @@ draw_border(Client *c) {
 	char *act_sep = *c->title ? config.separator : "";
 	snprintf(tbuf, TITLE_BUF_LEN, config.title_fmt, act_title, act_sep, c->order);
 	#ifdef LOGNAME
-	fprintf(logfn, "tbuf =%ld,c-w=%d.\n", strlen(tbuf), c-w);
+	fprintf(logfn, "tbuf =%ld,c->w=%d.\n", strlen(tbuf), c->w);
 	fflush(logfn);
 	if (strlen(tbuf) > c->w) {
 		fprintf(logfn, "tbuf too big.\n");
@@ -1889,10 +1889,13 @@ parse_args(int argc, char *argv[]) {
 					switch(alg) {
 						case 0:
 							config.title_alg = ORIG_TITLE_ALGORITHM;
+							break;
 						case 1:
 							config.title_alg = INI_TGVAUGN;
+							break;
 						case 2:
 							config.title_alg = INI_SUPPOSITION;
+							break;
 						default:
 							usage();
 					}
