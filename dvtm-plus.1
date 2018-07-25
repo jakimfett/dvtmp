@@ -40,6 +40,8 @@ Set command modifier at runtime.
 .BI \-d \ delay
 Set the delay ncurses waits before deciding if a character that might be
 part of an escape sequence is actually part of an escape sequence.
+It also can be changed with the ESCDELAY environment variable or delay in main section of the
+ini file.
 .TP
 .BI \-h \ lines
 Set the scrollback history buffer size at runtime.
@@ -48,6 +50,7 @@ Set the scrollback history buffer size at runtime.
 Set a static terminal
 .I title
 and don't change it to the one of the currently focused window.
+It also can be set with title in the main section of the ini file.
 .TP
 .BI \-s \ status-fifo
 Open or create the named pipe
@@ -76,53 +79,65 @@ but can be changed in
 .I config.h
 or with the
 .B \-m
-command line option.
+command line option or 
+with mod in the main section of the ini file.
 .TP
 .B Mod\-c
 Create a new shell window. Change with DVTM_PLUS_CREATE environment
-variable.
+variable or
+with create in the keys section of the ini file.
 .TP
 .B Mod\-C
 Create a new shell window using the current working directory of the
-focused window. Change with DVTM_PLUS_CREATE_CWD environment variable.
+focused window. Change with DVTM_PLUS_CREATE_CWD environment variable or
+with create_cwd in the keys section of the ini file.
 .TP
 .B Mod\-x\-x
 Close focused window. Change with the DVTM_PLUS_KILL_CLIENT
-environment variable.
+environment variable or
+with kill_client in the keys section of the ini file.
 .TP
 .B Mod\-l
 Increases the master area width about 5% (all except grid and 
 fullscreen layout). Change with the DVTM_PLUS_MASTER_DECR environment
-variable.
+variable or
+with incmaster in the keys section of the ini file.
 .TP
 .B Mod\-h
 Decreases the master area width about 5% (all except grid and
 fullscreen layout). Change with the DVTM_PLUS_MASTER_INCR environment
-variable.
+variable or
+with decrmaster in the keys section of the ini file.
 .TP
 .B Mod\-i
 Increase number of windows displayed in the master area. Change with
 the DVTM_PLUS_INCR_WINDOWS environment variable.
+with decrmaster in the keys section of the ini file.
 .TP
 .B Mod\-d
 Decrease number of windows displayed in the master area. Change with
 the DVTM_PLUS_DECR_WINDOWS environment variable.
+with decrmaster in the keys section of the ini file.
 .TP
 .B Mod\-j
 Focus next window. Change with the DVTM_PLUS_FOCUS_NEXT environment
-variable.
+variable or
+with focusnext in the keys section of the ini file.
 .TP
 .B Mod\-k
 Focus previous window. Change with the DVTM_PLUS_FOCUS_PREV environment
-variable.
+variable or
+with focusprev in the keys section of the ini file.
 .TP
 .B Mod\-J
 Focus next non minimized window. Change with the DVTM_PLUS_FOCUS_NEXT_MIN
-environment variable.
+environment variable or
+with focusnextnm in the keys section of the ini file.
 .TP
 .B Mod\-K
 Focus previous non minimized window. Change with the DVTM_PLUS_FOCUS_PREV_MINV
-environment variable.
+environment variable or
+with focusprevnm in the keys section of the ini file.
 .TP
 .BI Mod\- n
 Focus the
@@ -131,14 +146,17 @@ window.
 .TP
 .B Mod\-Tab
 Focus previously selected window. Change with the DVTM_PLUS_FOCUS_PREV_WINDOW
-environment variable.
+environment variable or
+with focuslast in the keys section of the ini file.
 .TP
 .B Mod\-.
-Toggle minimization of current window.
+Toggle minimization of current window or
+with toggleminimize in the keys section of the ini file.
 .TP
 .B Mod\-m
 Maximize current window (change to fullscreen layout). Change with the 
-DVTM_PLUS_MAX_WINDOW environment variable.
+DVTM_PLUS_MAX_WINDOW environment variable or
+with max_window in the keys section of the ini file.
 .TP
 .B Shift\-PageUp
 .TQ
@@ -152,31 +170,38 @@ Scroll down.
 .TP
 .B Mod\-Space
 Toggle between defined layouts (affects all windows). Change with the
-DVTM_PLUS_TOGGLE_LAYOUTS environment variable.
+DVTM_PLUS_TOGGLE_LAYOUTS environment variable or
+with toggle_layouts in the keys section of the ini file.
 .TP
 .B Mod\-Enter
 Zooms/cycles current window to/from master area. Change with the
-DVTM_PLUS_ZOOM environment variable.
+DVTM_PLUS_ZOOM environment variable or
+with zoom in the keys section of the ini file.
 .TP
 .B Mod\-f
 Change to vertical stack tiling layout. Change with the
-DVTM_PLUS_TILE_VERTICAL environment variable.
+DVTM_PLUS_TILE_VERTICAL environment variable or
+with setlayout_vertical in the keys section of the ini file.
 .TP
 .B Mod\-b
 Change to bottom stack tiling layout. Change with the DVTM_PLUS_TILE_BOTTOM
-environment variable.
+environment variable or
+with setlayout_bottom in the keys section of the ini file.
 .TP
 .B Mod\-g
 Change to grid layout. Change with the DVTM_PLUS_TILE_GRID environment
-variable.
+variable or
+with setlayout_grid in the keys section of the ini file.
 .TP
 .B Mod\-s
 Show/hide the status bar. Change with the DVTM_PLUS_SHOW_HIDE_STATUS
-environment variable.
+environment variable or
+with togglebar in the keys section of the ini file.
 .TP
 .B Mod\-S
 Toggle position of the status bar between top and bottom. Change with the
-DVTM_PLUS_TOGGLE_STATUS_LOC environment variable.
+DVTM_PLUS_TOGGLE_STATUS_LOC environment variable or
+with togglebarpos in the keys section of the ini file.
 .TP
 .B Mod\-r
 .TQ
@@ -184,27 +209,33 @@ DVTM_PLUS_TOGGLE_STATUS_LOC environment variable.
 Redraw whole screen.  Change control mod L with the DVTM_PLUS_REDRAW1
 environment variable. Change the Mod with r with the DVTM_PLUS_REDRAW2
 environment variable.
+Or with redraw1 and redraw2 respectively in the keys section of the ini file.
 .TP
 .B Mod\-a
 Toggle keyboard multiplexing mode, if activated keypresses are sent to all
 visible windows. Change with the DVTM_PLUS_MULTIPLEX_TOGGLE environment
-variable.
+variable or
+with toggler_multiplex in the keys section of the ini file.
 .TP
 .B Mod\-M
 Toggle dvtm-plus mouse grabbing. Change with the DVTM_PLUS_TOGGLE_MOUSE
-environment variable.
+environment variable or
+with togglemouse in the keys section of the ini file.
 .TP
 .B Mod\-e
 Enter copy mode (see section below for further information). Change with
-the DVTM_PLUS_COPY_MODE1 environment variable.
+the DVTM_PLUS_COPY_MODE1 environment variable or
+with copymode1 in the keys section of the ini file.
 .TP
 .B Mod\-/
 Enter copy mode and start searching forward (assumes a vi-like editor).
-Change with the DVTM_PLUS_COPY_MODE2 environment variable.
+Change with the DVTM_PLUS_COPY_MODE2 environment variable or
+with copymode2 in the keys section of the ini file.
 .TP
 .B Mod\-p
 Paste last copied text from copy mode at current cursor position. Change
-with the DVTM_PLUS_PASTE environment variable.
+with the DVTM_PLUS_PASTE environment variable or
+with paste in the keys section of the ini file.
 .TP
 .B Mod\-?
 Show this manual page.
@@ -216,21 +247,30 @@ Send the Mod key.
 .TQ
 .B Mod-v-[1..n]
 View all windows with nth tag.
+Change with the DVTM_PLUS_VIEW environment variable or
+with view in the keys section of the ini file.
 .TP
 .B Mod-0
 View all windows with any tag.
 .TP
 .B Mod-v-Tab
 Toggles to the previously selected tags.
+See above for changing v to another key.
 .TP
 .B Mod-V-[1..n]
 Add/remove all windows with nth tag to/from the view.
+Change with the DVTM_PLUS_TOGGLE_VIEW environment variable or
+with toggleview in the keys section of the ini file.
 .TP
 .B Mod-t-[1..n]
 Apply nth tag to focused window.
+Change with the DVTM_PLUS_TAG environment variable or
+with tag in the keys section of the ini file.
 .TP
 .B Mod-T-[1..n]
 Add/remove nth tag to/from focused window.
+Change with the DVTM_PLUS_TOGGLE_TAG environment variable or
+with toggletag in the keys section of the ini file.
 .TP
 .B Mod\-q\-q
 Quit dvtm-plus.
@@ -246,6 +286,8 @@ Alternatively you can disable mouse support at compile time, start dvtm-plus wit
 .B -M
 flag or toggle mouse support during runtime with
 .BR Mod\-M .
+Change with the DVTM_PLUS_TOGGLE_MOUSE environment variable or
+with togglemouse in the keys section of the ini file.
 .TP
 .B Button1 click
 Focus window.
@@ -263,8 +305,8 @@ Copy mode gives easy access to past output by piping it to an editor. What
 ever the editor prints to stdout upon exiting will be stored in an internal
 register and can be pasted into other clients (via
 .B Mod\-p
-)
-.SH ENVIRONMENT VARIABLES
+) This works with vis and some other editors but not vim. 
+.SH ENVIRONMENT VARIABLES not listed above
 .TP
 .B DVTM_PLUS
 Each process spawned by dvtm-plus will have this variable set to the dvtm-plus version
@@ -306,7 +348,11 @@ status bar.
 .SH CUSTOMIZATION
 dvtm-plus is customized by creating a custom
 .I config.h
-and (re)compiling the source code.
+and (re)compiling the source code or by setting the
+above environment variables or an ini file .dvtm-plus.conf in the home
+directory. The ini file takes precedence over the environment variables
+which can be defined in both places. This was changed so that it would be more acccessible to people
+who can't code or with disabilities.
 This keeps it fast, secure and simple.
 .SH AUTHOR
 dvtm-plus is written by Marc André Tanner <mat at brain-dump.org>

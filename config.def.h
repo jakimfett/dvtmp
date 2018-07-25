@@ -106,12 +106,15 @@ static Layout layouts[] = {
 #define COPY_MODE2  '/'
 #define PASTE  'p'
 #define VIEW  'v'
+#define TOGGLE_VIEW  'V'
+#define TAG_KEY  't'
+#define TOGGLE_TAG_KEY  'T'
 
 #define TAGKEYS(KEY,TAG) \
-	{ { MOD, 'v', KEY,     }, { view,           { tags[TAG] }               } }, \
-	{ { MOD, 't', KEY,     }, { tag,            { tags[TAG] }               } }, \
-	{ { MOD, 'V', KEY,     }, { toggleview,     { tags[TAG] }               } }, \
-	{ { MOD, 'T', KEY,     }, { toggletag,      { tags[TAG] }               } },
+	{ { MOD, VIEW, KEY,     }, { view,           { tags[TAG] }               } }, \
+	{ { MOD, TAG_KEY, KEY,     }, { tag,            { tags[TAG] }               } }, \
+	{ { MOD, TOGGLE_VIEW, KEY,     }, { toggleview,     { tags[TAG] }               } }, \
+	{ { MOD, TOGGLE_TAG_KEY, KEY,     }, { toggletag,      { tags[TAG] }               } },
 
 /* you can at most specifiy MAX_ARGS (3) number of arguments */
 static KeyBinding bindings[] = {

@@ -272,7 +272,10 @@ EnvMod env_mods[] = {
 	{"copymode1", COPY_MODE1, "DVTM_PLUS_COPY_MODE1"},
 	{"copymode2", COPY_MODE2, "DVTM_PLUS_COPY_MODE2"},
 	{"paste", PASTE, "DVTM_PLUS_PASTE"},
-	{"view", VIEW, "DVTM_PLUS_VIEW"}};
+	{"view", VIEW, "DVTM_PLUS_VIEW"},
+	{"toggleview", TOGGLE_VIEW, "DVTM_PLUS_TOGGLE_VIEW"},
+	{"tag", TAG_KEY, "DVTM_PLUS_TAG"},
+	{"toggletag", TOGGLE_TAG_KEY, "DVTM_PLUS_TOGGLE_TAG"}};
 
 unsigned int elen = sizeof(env_mods) / sizeof(EnvMod);
 
@@ -1019,6 +1022,8 @@ ini_handler(void *user, const char *section,
 			ini_strncpy(config.title_fmt, value, 255);
 		} else if (strcmp(name, "history")==0) {
 			screen.history = atoi(value);
+		} else if (strcmp(name, "delay")==0) {
+			set_escdelay(atoi(value));
 		} else if (strcmp(name, "separator")==0) {
 			ini_strncpy(config.separator, value, 255);
 		} else if (strcmp(name, "mod")==0) {
@@ -1058,18 +1063,9 @@ proc_customization(void) {
 	
 	// Read config file if present:
 	char *home_dir = getenv("HOME");
-	char subdir_dir[256];
-	if (home_dir == NULL) {
-		home_dir = getenv("APPDATA");
-		if (home_dir != NULL) {
-			strncpy(subdir_dir, "dvtm-plus/", 255);
-		}
-	} else {
-		subdir_dir[0] = '\0';
-	}
 	bool config_found = 0;
 	if (home_dir != NULL) {
-		snprintf(iniFileName, 255, "%s%s/.dvtm-plus.conf", home_dir, subdir_dir);
+		snprintf(iniFileName, 255, "%s/.dvtm-plus.conf", home_dir);
 		if (access(iniFileName, R_OK)==0) {
 			printf("Config file found.\n");
 			config_found = 0;
