@@ -102,6 +102,7 @@ static Layout layouts[] = {
 #define MULTIPLEX_TOGGLE  'a'
 #define REDRAW_CTL_L  CTRL('L')
 #define REDRAW_R  'r'
+#define REREAD_INI  CTRL('r')
 #define COPY_MODE1  'e'
 #define COPY_MODE2  '/'
 #define PASTE  'p'
@@ -154,6 +155,7 @@ static KeyBinding bindings[] = {
 	{ { MOD, MULTIPLEX_TOGGLE,          }, { togglerunall,   { NULL }                    } },
 	{ { MOD, REDRAW_CTL_L,    }, { redraw,         { NULL }                    } },
 	{ { MOD, REDRAW_R,          }, { redraw,         { NULL }                    } },
+	{ { MOD, REREAD_INI,          }, { readini,         { NULL }                    } },
 	{ { MOD, COPY_MODE1,          }, { copymode,       { NULL }                    } },
 	{ { MOD, COPY_MODE2,          }, { copymode,       { "/" }                     } },
 	{ { MOD, PASTE,          }, { paste,          { NULL }                    } },

@@ -170,17 +170,22 @@ typedef struct {
 /*
  * Structure containing main configuration loaded from config file.
  */
+typedef enum { SET_DEFAULT, SET_ARG, SET_ENV, SET_INI} HowSet;
 typedef enum { ORIG_TITLE_ALGORITHM, INI_TGVAUGN, INI_SUPPOSITION} TitleAlgorithm;
 typedef struct {
 	char separator[256];
+	HowSet sep_set;
 	char title_fmt[256];
+	HowSet title_fmt_set;
 	TitleAlgorithm title_alg;
+	HowSet alg_set;
 } Configuration;
 
 typedef struct {
 	const char *name;
 	char keyb;
 	const char *envn;
+	HowSet how_set;
 } EnvMod;
 
 #define LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
@@ -207,6 +212,7 @@ static void killclient(const char *args[]);
 static void paste(const char *args[]);
 static void quit(const char *args[]);
 static void redraw(const char *args[]);
+static void readini(const char *args[]);
 static void scrollback(const char *args[]);
 static void send(const char *args[]);
 static void setlayout(const char *args[]);
@@ -244,38 +250,38 @@ static char *title = NULL;
 #include "config.h"
 
 EnvMod env_mods[] = {
-	{"create", CREATE, "DVTM_PLUS_CREATE"},
-	{"create_cwd", CREATE_CWD, "DVTM_PLUS_CREATE_CWD"},
-	{"kill_client", KILL_CLIENT, "DVTM_PLUS_KILL_CLIENT"},
-	{"focusnext", FOCUS_NEXT, "DVTM_PLUS_FOCUS_NEXT"},
-	{"focusnextnm", FOCUS_NEXT_MIN, "DVTM_PLUS_FOCUS_NEXT_MIN"},
-	{"focusprevnm", FOCUS_PREV_MIN, "DVTM_PLUS_FOCUS_PREV_MINV"},
-	{"focusprev", FOCUS_PREV, "DVTM_PLUS_FOCUS_PREV"},
-	{"setlayout_vertical", TILE_VERTICAL, "DVTM_PLUS_TILE_VERTICAL"},
-	{"setlayout_grid", TILE_GRID, "DVTM_PLUS_TILE_GRID"},
-	{"setlayout_bottom", TILE_BOTTOM, "DVTM_PLUS_TILE_BOTTOM"},
-	{"max_window", MAX_WINDOW, "DVTM_PLUS_MAX_WINDOW"},
-	{"toggle_layouts", TOGGLE_LAYOUTS, "DVTM_PLUS_TOGGLE_LAYOUTS"},
-	{"incmaster", INCR_WINDOWS, "DVTM_PLUS_INCR_WINDOWS"},
-	{"decrmaster", DECR_WINDOWS, "DVTM_PLUS_DECR_WINDOWS"},
-	{"decr_master", MASTER_DECR, "DVTM_PLUS_MASTER_DECR"},
-	{"incr_master", MASTER_INCR, "DVTM_PLUS_MASTER_INCR"},
-	{"toggleminimize", TOGGLE_MIN, "DVTM_PLUS_TOGGLE_MIN"},
-	{"togglebar", SHOW_HIDE_STATUS, "DVTM_PLUS_SHOW_HIDE_STATUS"},
-	{"togglebarpos", TOGGLE_STATUS_LOC, "DVTM_PLUS_TOGGLE_STATUS_LOC"},
-	{"togglemouse", TOGGLE_MOUSE, "DVTM_PLUS_TOGGLE_MOUSE"},
-	{"zoom", ZOOM1, "DVTM_PLUS_ZOOM"},
-	{"focuslast", FOCUS_PREV_WINDOW, "DVTM_PLUS_FOCUS_PREV_WINDOW"},
-	{"toggler_multiplex", MULTIPLEX_TOGGLE, "DVTM_PLUS_MULTIPLEX_TOGGLE"},
-	{"redraw1", REDRAW_CTL_L, "DVTM_PLUS_REDRAW1"},
-	{"redraw2", REDRAW_R, "DVTM_PLUS_REDRAW2"},
-	{"copymode1", COPY_MODE1, "DVTM_PLUS_COPY_MODE1"},
-	{"copymode2", COPY_MODE2, "DVTM_PLUS_COPY_MODE2"},
-	{"paste", PASTE, "DVTM_PLUS_PASTE"},
-	{"view", VIEW, "DVTM_PLUS_VIEW"},
-	{"toggleview", TOGGLE_VIEW, "DVTM_PLUS_TOGGLE_VIEW"},
-	{"tag", TAG_KEY, "DVTM_PLUS_TAG"},
-	{"toggletag", TOGGLE_TAG_KEY, "DVTM_PLUS_TOGGLE_TAG"}};
+	{"create", CREATE, "DVTM_PLUS_CREATE", SET_DEFAULT},
+	{"create_cwd", CREATE_CWD, "DVTM_PLUS_CREATE_CWD", SET_DEFAULT},
+	{"kill_client", KILL_CLIENT, "DVTM_PLUS_KILL_CLIENT", SET_DEFAULT},
+	{"focusnext", FOCUS_NEXT, "DVTM_PLUS_FOCUS_NEXT", SET_DEFAULT},
+	{"focusnextnm", FOCUS_NEXT_MIN, "DVTM_PLUS_FOCUS_NEXT_MIN", SET_DEFAULT},
+	{"focusprevnm", FOCUS_PREV_MIN, "DVTM_PLUS_FOCUS_PREV_MINV", SET_DEFAULT},
+	{"focusprev", FOCUS_PREV, "DVTM_PLUS_FOCUS_PREV", SET_DEFAULT},
+	{"setlayout_vertical", TILE_VERTICAL, "DVTM_PLUS_TILE_VERTICAL", SET_DEFAULT},
+	{"setlayout_grid", TILE_GRID, "DVTM_PLUS_TILE_GRID", SET_DEFAULT},
+	{"setlayout_bottom", TILE_BOTTOM, "DVTM_PLUS_TILE_BOTTOM", SET_DEFAULT},
+	{"max_window", MAX_WINDOW, "DVTM_PLUS_MAX_WINDOW", SET_DEFAULT},
+	{"toggle_layouts", TOGGLE_LAYOUTS, "DVTM_PLUS_TOGGLE_LAYOUTS", SET_DEFAULT},
+	{"incmaster", INCR_WINDOWS, "DVTM_PLUS_INCR_WINDOWS", SET_DEFAULT},
+	{"decrmaster", DECR_WINDOWS, "DVTM_PLUS_DECR_WINDOWS", SET_DEFAULT},
+	{"decr_master", MASTER_DECR, "DVTM_PLUS_MASTER_DECR", SET_DEFAULT},
+	{"incr_master", MASTER_INCR, "DVTM_PLUS_MASTER_INCR", SET_DEFAULT},
+	{"toggleminimize", TOGGLE_MIN, "DVTM_PLUS_TOGGLE_MIN", SET_DEFAULT},
+	{"togglebar", SHOW_HIDE_STATUS, "DVTM_PLUS_SHOW_HIDE_STATUS", SET_DEFAULT},
+	{"togglebarpos", TOGGLE_STATUS_LOC, "DVTM_PLUS_TOGGLE_STATUS_LOC", SET_DEFAULT},
+	{"togglemouse", TOGGLE_MOUSE, "DVTM_PLUS_TOGGLE_MOUSE", SET_DEFAULT},
+	{"zoom", ZOOM1, "DVTM_PLUS_ZOOM", SET_DEFAULT},
+	{"focuslast", FOCUS_PREV_WINDOW, "DVTM_PLUS_FOCUS_PREV_WINDOW", SET_DEFAULT},
+	{"toggler_multiplex", MULTIPLEX_TOGGLE, "DVTM_PLUS_MULTIPLEX_TOGGLE", SET_DEFAULT},
+	{"redraw1", REDRAW_CTL_L, "DVTM_PLUS_REDRAW1", SET_DEFAULT},
+	{"redraw2", REDRAW_R, "DVTM_PLUS_REDRAW2", SET_DEFAULT},
+	{"copymode1", COPY_MODE1, "DVTM_PLUS_COPY_MODE1", SET_DEFAULT},
+	{"copymode2", COPY_MODE2, "DVTM_PLUS_COPY_MODE2", SET_DEFAULT},
+	{"paste", PASTE, "DVTM_PLUS_PASTE", SET_DEFAULT},
+	{"view", VIEW, "DVTM_PLUS_VIEW", SET_DEFAULT},
+	{"toggleview", TOGGLE_VIEW, "DVTM_PLUS_TOGGLE_VIEW", SET_DEFAULT},
+	{"tag", TAG_KEY, "DVTM_PLUS_TAG", SET_DEFAULT},
+	{"toggletag", TOGGLE_TAG_KEY, "DVTM_PLUS_TOGGLE_TAG", SET_DEFAULT}};
 
 unsigned int elen = sizeof(env_mods) / sizeof(EnvMod);
 
@@ -1008,6 +1014,9 @@ ini_strncpy(char *dest, const char *src, unsigned int len) {
 
 static void
 ini_load_defaults() {
+	config.sep_set = SET_DEFAULT;
+	config.title_fmt_set = SET_DEFAULT;
+	config.alg_set = SET_DEFAULT;
 	ini_strncpy(config.separator, SEPARATOR, 255);
 	ini_strncpy(config.title_fmt, TITLE_FMT, 255);
 	config.title_alg = INI_TGVAUGN;
@@ -1033,6 +1042,7 @@ ini_handler(void *user, const char *section,
 		for (unsigned int b = 0; b < elen; b++) {
 			if (!strcmp(env_mods[b].name, name)) {
 				upd_char_bindings(1, env_mods[b].keyb, value);
+				env_mods[b].how_set = SET_INI;
 				break;
 			}
 		}
@@ -1042,6 +1052,9 @@ ini_handler(void *user, const char *section,
 
 void eval_envs(void) {
 	
+	if (!getenv("ESCDELAY"))
+		set_escdelay(100);
+
 	for (unsigned int ic = 0 ; ic < elen ; ic++) {
 		char *nkb = getenv(env_mods[ic].envn);
 		if (nkb != NULL) {
@@ -1054,44 +1067,12 @@ void eval_envs(void) {
 	
 }
 
-static void
-proc_customization(void) {
-	char iniFileName[256];
-
-	// Load default configration from config.h definitions:
-	ini_load_defaults();
-	
-	// Read config file if present:
-	char *home_dir = getenv("HOME");
-	bool config_found = 0;
-	if (home_dir != NULL) {
-		snprintf(iniFileName, 255, "%s/.dvtm-plus.conf", home_dir);
-		if (access(iniFileName, R_OK)==0) {
-			printf("Config file found.\n");
-			config_found = 0;
-			if (ini_parse(iniFileName, ini_handler, NULL) < 0) {
-				fprintf(stderr, "Error reading config file.");
-				exit(1);
-			}
-		}
-	}
-	if (!config_found) {
-		eval_envs();
-	}
-	if (obindings != NULL) {
-		free(obindings);
-		obindings = NULL;
-	}
-
-}
 
 static void
 setup(void) {
 
 	shell = getshell();
 	setlocale(LC_CTYPE, "");
-
-	proc_customization();
 
 	initscr();
 	start_color();
@@ -1408,6 +1389,36 @@ redraw(const char *args[]) {
 		}
 	}
 	resize_screen();
+}
+
+static void
+readini(const char *args[]) {
+	char iniFileName[256];
+
+	// Read config file if present:
+	char *home_dir = getenv("HOME");
+	bool cpy_bindings = 0;
+	if (obindings == NULL) {
+		cpy_bindings = 1;
+		obindings = malloc(sizeof(bindings));
+		memcpy(obindings, bindings, sizeof(bindings));
+	}
+
+	if (home_dir != NULL) {
+		snprintf(iniFileName, 255, "%s/.dvtm-plus/config", home_dir);
+		if (access(iniFileName, R_OK)==0) {
+			printf("Config file found.\n");
+			if (ini_parse(iniFileName, ini_handler, NULL) < 0) {
+				fprintf(stderr, "Error reading config file.");
+				exit(1);
+			}
+		}
+	}
+	if (cpy_bindings) {
+		free(obindings);
+		obindings = NULL;
+	}
+
 }
 
 static void
@@ -1844,8 +1855,6 @@ parse_args(int argc, char *argv[]) {
 
 	if (name && (name = strrchr(name, '/')))
 		dvtm_name = name + 1;
-	if (!getenv("ESCDELAY"))
-		set_escdelay(100);
 	for (int arg = 1; arg < argc; arg++) {
 		if (argv[arg][0] != '-') {
 			const char *args[] = { argv[arg], NULL, NULL };
@@ -1937,6 +1946,12 @@ main(int argc, char *argv[]) {
 	#endif
 
 	setenv("DVTM_PLUS", VERSION, 1);
+	// Load default configration from config.h definitions:
+	ini_load_defaults();
+	
+	readini((const char **)NULL);
+	eval_envs();
+
 	if (!parse_args(argc, argv)) {
 		setup();
 		startup(NULL);

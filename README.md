@@ -1,4 +1,4 @@
-# dvtm-plus - dynamic virtual terminal manager configurable by an ini file.
+# dvtm-plus - dynamic virtual terminal manager configurable by an ini file whichon unix is in ~/.dvtm-plus/config
 
 This program is modifed from 
 [dvtm](http://www.brain-dump.org/projects/dvtm/) brings the concept

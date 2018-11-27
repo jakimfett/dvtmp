@@ -24,7 +24,8 @@ dvtm-plus \- dynamic virtual terminal manager which is configurable
 .SH DESCRIPTION
 dvtm-plus is a dynamic tiling window manager which is configurable for the console.
 As a console window manager it tries to make it easy to work with multiple
-console based applications.
+console based applications. It is configurable by an ini file
+~/.dvtm-plus/config.
 .SH OPTIONS
 .TP
 .B \-v
@@ -35,7 +36,9 @@ Toggle default mouse grabbing upon startup. Use this to allow normal mouse opera
 under X.
 .TP
 .BI \-m \ modifier
-Set command modifier at runtime.
+Set command modifier at runtime. This can also be set in the ini file in the
+main section using the mod key. The ^ character indicates a control key. The
+default modifier is ^g.
 .TP
 .BI \-d \ delay
 Set the delay ncurses waits before deciding if a character that might be
@@ -44,7 +47,8 @@ It also can be changed with the ESCDELAY environment variable or delay in main s
 ini file.
 .TP
 .BI \-h \ lines
-Set the scrollback history buffer size at runtime.
+Set the scrollback history buffer size at runtime. The default is 500.
+This can also be set by the history key in the main section of the ini file.
 .TP
 .BI \-t \ title
 Set a static terminal
@@ -57,13 +61,13 @@ Open or create the named pipe
 .I status-fifo
 read its content and display it in the statusbar. See the
 .I dvtm-plus-status
-script for an usage example.
+script for a usage example.
 .TP
 .BI \-c \ cmd-fifo
 Open or create the named pipe
 .I cmd-fifo
 and look for commands to execute which were defined in
-.IR config.h .
+.IR config.h, the defaults in the man page, or the key values in the ini file.
 .TP
 .IR command \ ...
 Execute
