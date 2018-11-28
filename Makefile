@@ -59,7 +59,7 @@ dist-rpm: clean dist
 	@rpmdev-setuptree
 	@mv $(PKG_NAME)-${VERSION}.tar.gz ~/rpmbuild/SOURCES/
 	@cp $(PKG_NAME).spec ~/rpmbuild/SPECS
-	@cp dvtm-plus-0.16-build.patch  ~/rpmbuild/SOURCES
+	@cp dvtm-plus-$(BASE_VERSION)-build.patch  ~/rpmbuild/SOURCES
 	@rpmbuild -v -ba --clean ~/rpmbuild/SPECS/$(PKG_NAME).spec
 
 install: dvtm-plus

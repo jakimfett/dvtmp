@@ -46,6 +46,8 @@ int ESCDELAY;
 #endif
 
 #define ZOOM_EVN "DVTM_PLUS_ZOOM"
+#define READ_INI_USER "new"
+#define MERGE_INI_USER "old"
 
 typedef struct {
 	float mfact;
@@ -1397,11 +1399,15 @@ readini(const char *args[]) {
 
 	// Read config file if present:
 	char *home_dir = getenv("HOME");
-	bool cpy_bindings = 0;
-	if (obindings == NULL) {
-		cpy_bindings = 1;
+	// Actually the user tells the handler to merge or read i.e. take
+	// whatever is in the ini file.
+	char *ini_user = NULL;
+	if (args != NULL) {
 		obindings = malloc(sizeof(bindings));
 		memcpy(obindings, bindings, sizeof(bindings));
+		ini_user = (void *)args;
+	} else {
+		ini_user = (void *)READ_INI_USER;
 	}
 
 	if (home_dir != NULL) {
@@ -1414,7 +1420,7 @@ readini(const char *args[]) {
 			}
 		}
 	}
-	if (cpy_bindings) {
+	if (args != NULL) {
 		free(obindings);
 		obindings = NULL;
 	}

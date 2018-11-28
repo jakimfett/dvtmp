@@ -1,5 +1,6 @@
 # dvtm version
-VERSION = 0.16.3dev
+BASE_VERSION = 0.17
+VERSION = ${BASE_VERSION}.0dev
 
 # Customize below to fit your system
 

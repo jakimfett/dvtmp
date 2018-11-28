@@ -1,11 +1,11 @@
 Name:           dvtm-plus
-Version:        0.16.3dev
+Version:        0.17.0dev
 Release:        5%{?dist}
 Summary:        Configurable tiling window management for the console
 License:        MIT and ISC
 URL:            http://www.brain-dump.org/projects/%{name}/
 Source0:        http://www.brain-dump.org/projects/%{name}/%{name}-%{version}.tar.gz
-Patch0:         %{name}-0.16-build.patch
+Patch0:         %{name}-0.17-build.patch
 BuildRequires:  binutils
 BuildRequires:  coreutils
 BuildRequires:  gcc
@@ -20,7 +20,8 @@ X11-window managers like dwm to the console. It is an enhancement
 to dvtm. As a console window
 manager it tries to make it easy to work with multiple console based
 programs like vim, mutt, cmus or irssi. Unlike dvtm and dwm, dvtm-plus has
-a configuration file ~/.dvtm-plus/config that allows you to configure the keys.
+a configuration file ~/.dvtm-plus/config that allows you to configure the keys
+or environment variables.
 
 %prep
 %setup -q
