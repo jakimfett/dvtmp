@@ -15,16 +15,27 @@ utf8_test_fn = "UTF-8-demo.txt"
 copy = utf8_test_fn + ".copy"
 utf8_test_url = "http://www.cl.cam.ac.uk/~mgk25/ucs/examples/" + utf8_test_fn
 keep_log = 1
-fp = open(test_log, "w")
+trace_log = 0
+mfp = open(test_log, "w")
 tres = 0
 
 def logit(msg):
-    if fp is not None:
-        fp.write("{0}\n".format(msg))
+    global mfp
+    if mfp is not None:
+        mfp.write("{0}\n".format(msg))
 
 def prlog(msg):
     print("{0}\n".format(msg))
     logit(msg)
+
+def tr_ps():
+    global mfp
+    res = subprocess.call("ps -ef | grep %s 2>&1 > ps.log" % (os.environ["USER"]), shell=True)
+    res = subprocess.call("cat ps.log", shell=True)
+    if mfp is not None:
+        mfp.close()
+        res = subprocess.call("cat ps.log >> %s" % (trace_log), shell=True)
+        mfp = open(test_log, "w")
 
 def sh_cmd(cmd):
     prlog("Sending " + cmd)
@@ -32,6 +43,7 @@ def sh_cmd(cmd):
     time.sleep(2)
     logit(child.before)
     logit(child.after)
+    tr_ps()
 
 def dvtmp_input(cmd):
     prlog("Sending without added line feed." + cmd)
@@ -39,6 +51,7 @@ def dvtmp_input(cmd):
     time.sleep(2)
     logit(child.before)
     logit(child.after)
+    tr_ps()
 
 def dvtmp_cmd(cmd):
     prlog("Sending with mod character." + cmd)
@@ -48,6 +61,7 @@ def dvtmp_cmd(cmd):
     time.sleep(2)
     logit(child.before)
     logit(child.after)
+    tr_ps()
 
 def cat_st_edit():
     sh_cmd("cat " + utf8_test_fn)
@@ -61,7 +75,7 @@ def check_copy_mode():
         return res
 
     if (not os.path.isfile(utf8_test_fn)):
-        res = subprocess.call("wget '%s' -O '%s' > /dev/null 2>&1 -o wget1.log > wget2.log" % (utf8_test_url, utf8_test_fn), shell=True)
+        res = subprocess.call("wget '%s' -O '%s' 2>&1 -o wget1.log > wget2.log" % (utf8_test_url, utf8_test_fn), shell=True)
         if (res != 0) or (not os.path.isfile(utf8_test_fn)):
             prlog("No %s downloaded. Skipping copy mode test." % (utf8_test_url))
             return 1
@@ -72,7 +86,7 @@ def check_copy_mode():
     logit(child.after)
     cat_st_edit()
     dvtmp_input(":q!")
-    sh_cmd("echo 'first after editing'" + copy)
+    sh_cmd("echo first after editing %s without changes." % (copy))
     res = child.expect("\$", timeout=30)
 
     cat_st_edit()
@@ -85,7 +99,7 @@ def check_copy_mode():
     dvtmp_input("$")
     dvtmp_input(":")
     dvtmp_input("wq!\n")
-    sh_cmd("echo 'after editing'" + copy)
+    sh_cmd("echo after editing %s with changes." % (copy))
     res = child.expect("\$", timeout=30)
     sh_cmd("echo 'successfully out of editing'" + copy)
     res = child.expect("\$", timeout=30)
@@ -103,11 +117,13 @@ ic = 1
 while (ic < len(sys.argv) > 1) and (sys.argv[ic] == "--debug"):
 	if (sys.argv[ic] == "--debug"):
 		keep_log = 1
+        elif (sys.argv[ic] == "--trace"):
+		trace_log = 1
         else:
             dvtmp = sys.argv[ic]
             if not os.access(dvtmp, os.X_OK):
                 dvtmp = sys.argv[ic]
-                print("usage: [--debug] $0 path-to-dvtmp-binary")
+                print("usage: [--debug] [--trace_log] $0 path-to-dvtmp-binary")
                 exit(1)
         ic = ic + 1
 
@@ -132,8 +148,8 @@ if (res != 0):
     tres = res
 
 #Close log file.
-fp.close()
-fp = None
+mfp.close()
+mfp = None
 
 if (tres == 0) and (keep_log == 0):
     prlog("Removing test and log files.")
