@@ -1,9 +1,9 @@
-Name:           dvtm-config
-Version:        0.16.2a
+Name:           dvtmp
+Version:        0.16.3b
 Release:        5%{?dist}
-Summary:        Tiling window management for the console
+Summary:        Configurable tiling window management for the console
 License:        MIT and ISC
-URL:            http://www.brain-dump.org/projects/%{name}/
+URL:            https://github.com/taichifan/dvtmp
 Source0:        http://www.brain-dump.org/projects/%{name}/%{name}-%{version}.tar.gz
 Patch0:         %{name}-0.16-build.patch
 BuildRequires:  binutils
@@ -15,7 +15,7 @@ BuildRequires:  ncurses-devel
 BuildRequires:  sed
 
 %description
-dvtm-config brings the concept of tiling window management, popularized by
+dvtmp brings the concept of tiling window management, popularized by
 X11-window managers like dwm to the console. As a console window
 manager it tries to make it easy to work with multiple console based
 programs like vim, mutt, cmus or irssi.

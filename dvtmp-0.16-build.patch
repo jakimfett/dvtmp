@@ -3,19 +3,19 @@ index e0284b8..ee2feec 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -43,13 +43,11 @@ dist: clean
- 	@rm -rf dvtm-config-${VERSION}
+ 	@rm -rf dvtmp-${VERSION}
  
- install: dvtm-config
+ install: dvtmp
 -	@echo stripping executable
--	@${STRIP} dvtm-config
+-	@${STRIP} dvtmp
  	@echo installing executable file to ${DESTDIR}${PREFIX}/bin
  	@mkdir -p ${DESTDIR}${PREFIX}/bin
--	@cp -f dvtm-config ${DESTDIR}${PREFIX}/bin
-+	@cp -pf dvtm-config ${DESTDIR}${PREFIX}/bin
- 	@chmod 755 ${DESTDIR}${PREFIX}/bin/dvtm-config
--	@cp -f dvtm-config-status ${DESTDIR}${PREFIX}/bin
-+	@cp -pf dvtm-config-status ${DESTDIR}${PREFIX}/bin
- 	@chmod 755 ${DESTDIR}${PREFIX}/bin/dvtm-config-status
+-	@cp -f dvtmp ${DESTDIR}${PREFIX}/bin
++	@cp -pf dvtmp ${DESTDIR}${PREFIX}/bin
+ 	@chmod 755 ${DESTDIR}${PREFIX}/bin/dvtmp
+-	@cp -f dvtmp-status ${DESTDIR}${PREFIX}/bin
++	@cp -pf dvtmp-status ${DESTDIR}${PREFIX}/bin
+ 	@chmod 755 ${DESTDIR}${PREFIX}/bin/dvtmp-status
  	@echo installing manual page to ${DESTDIR}${MANPREFIX}/man1
  	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
 diff --git a/config.mk b/config.mk

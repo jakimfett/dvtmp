@@ -150,7 +150,7 @@ static KeyBinding bindings[] = {
 	{ { MOD, PASTE,          }, { paste,          { NULL }                    } },
 	{ { MOD, KEY_PPAGE,    }, { scrollback,     { "-1" }                    } },
 	{ { MOD, KEY_NPAGE,    }, { scrollback,     { "1"  }                    } },
-	{ { MOD, '?',          }, { create,         { "man dvtm-config", "dvtm-config help" } } },
+	{ { MOD, '?',          }, { create,         { "man dvtmp", "dvtmp help" } } },
 	{ { MOD, MOD,          }, { send,           { (const char []){MOD, 0} } } },
 	{ { KEY_SPREVIOUS,     }, { scrollback,     { "-1" }                    } },
 	{ { KEY_SNEXT,         }, { scrollback,     { "1"  }                    } },
@@ -222,7 +222,7 @@ static Cmd commands[] = {
 	{ "create", { create,	{ NULL } } },
 };
 
-/* gets executed when dvtm-config is started */
+/* gets executed when dvtmp is started */
 static Action actions[] = {
 	{ create, { NULL } },
 };
@@ -231,7 +231,7 @@ static char const * const keytable[] = {
 	/* add your custom key escape sequences */
 };
 
-/* editor to use for copy mode. If neither of DVTM_CONFIG_EDITOR, EDITOR and PAGER is
+/* editor to use for copy mode. If neither of DVTP_EDITOR, EDITOR and PAGER is
  * set the first entry is chosen. Otherwise the array is consulted for supported
  * options. A %d in argv is replaced by the line number at which the file should
  * be opened. If filter is true the editor is expected to work even if stdout is
@@ -241,7 +241,7 @@ static char const * const keytable[] = {
 static Editor editors[] = {
 	{ .name = "vis",         .argv = { "vis", "+%d", "-", NULL   }, .filter = true,  .color = false },
 	{ .name = "sandy",       .argv = { "sandy", "-d", "-", NULL  }, .filter = true,  .color = false },
-	{ .name = "dvtm-config-editor", .argv = { "dvtm-config-editor", "-", NULL  }, .filter = true,  .color = false },
+	{ .name = "dvtmp-editor", .argv = { "dvtmp-editor", "-", NULL  }, .filter = true,  .color = false },
 	{ .name = "vim",         .argv = { "vim", "+%d", "-", NULL   }, .filter = false, .color = false },
 	{ .name = "less",        .argv = { "less", "-R", "+%d", NULL }, .filter = false, .color = true  },
 	{ .name = "more",        .argv = { "more", "+%d", NULL       }, .filter = false, .color = false },

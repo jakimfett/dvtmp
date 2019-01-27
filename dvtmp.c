@@ -44,7 +44,7 @@ int ESCDELAY;
 # define set_escdelay(d) (ESCDELAY = (d))
 #endif
 
-#define ZOOM_EVN "DVTM_CONFIG_ZOOM"
+#define ZOOM_EVN "DVTMP_ZOOM"
 
 typedef struct {
 	float mfact;
@@ -231,40 +231,40 @@ struct env_mod_t {
 	const char *envn;
 };
 struct env_mod_t env_mods[] = {
-	{"create", CREATE, "DVTM_CONFIG_CREATE"},
-	{"create_cwd", CREATE_CWD, "DVTM_CONFIG_CREATE_CWD"},
-	{"kill_client", KILL_CLIENT, "DVTM_CONFIG_KILL_CLIENT"},
-	{"focusnext", FOCUS_NEXT, "DVTM_CONFIG_FOCUS_NEXT"},
-	{"focusnextnm", FOCUS_NEXT_MIN, "DVTM_CONFIG_FOCUS_NEXT_MIN"},
-	{"focusprevnm", FOCUS_PREV_MIN, "DVTM_CONFIG_FOCUS_PREV_MINV"},
-	{"focusprev", FOCUS_PREV, "DVTM_CONFIG_FOCUS_PREV"},
-	{"setlayout_vertical", TILE_VERTICAL, "DVTM_CONFIG_TILE_VERTICAL"},
-	{"setlayout_grid", TILE_GRID, "DVTM_CONFIG_TILE_GRID"},
-	{"setlayout_bottom", TILE_BOTTOM, "DVTM_CONFIG_TILE_BOTTOM"},
-	{"max_window", MAX_WINDOW, "DVTM_CONFIG_MAX_WINDOW"},
-	{"toggle_layouts", TOGGLE_LAYOUTS, "DVTM_CONFIG_TOGGLE_LAYOUTS"},
-	{"incmaster", INCR_WINDOWS, "DVTM_CONFIG_INCR_WINDOWS"},
-	{"decrmaster", DECR_WINDOWS, "DVTM_CONFIG_DECR_WINDOWS"},
-	{"decr_master", MASTER_DECR, "DVTM_CONFIG_MASTER_DECR"},
-	{"incr_master", MASTER_INCR, "DVTM_CONFIG_MASTER_INCR"},
-	{"toggleminimize", TOGGLE_MIN, "DVTM_CONFIG_TOGGLE_MIN"},
-	{"togglebar", SHOW_HIDE_STATUS, "DVTM_CONFIG_SHOW_HIDE_STATUS"},
-	{"togglebarpos", TOGGLE_STATUS_LOC, "DVTM_CONFIG_TOGGLE_STATUS_LOC"},
-	{"togglemouse", TOGGLE_MOUSE, "DVTM_CONFIG_TOGGLE_MOUSE"},
-	{"zoom", ZOOM1, "DVTM_CONFIG_ZOOM"},
-	{"focuslast", FOCUS_PREV_WINDOW, "DVTM_CONFIG_FOCUS_PREV_WINDOW"},
-	{"toggler_multiplex", MULTIPLEX_TOGGLE, "DVTM_CONFIG_MULTIPLEX_TOGGLE"},
-	{"redraw1", REDRAW_CTL_L, "DVTM_CONFIG_REDRAW1"},
-	{"redraw2", REDRAW_R, "DVTM_CONFIG_REDRAW2"},
-	{"copymode1", COPY_MODE1, "DVTM_CONFIG_COPY_MODE1"},
-	{"copymode2", COPY_MODE2, "DVTM_CONFIG_COPY_MODE2"},
-	{"paste", PASTE, "DVTM_CONFIG_PASTE"},
-	{"view", VIEW, "DVTM_CONFIG_VIEW"}};
+	{"create", CREATE, "DVTMP_CREATE"},
+	{"create_cwd", CREATE_CWD, "DVTMP_CREATE_CWD"},
+	{"kill_client", KILL_CLIENT, "DVTMP_KILL_CLIENT"},
+	{"focusnext", FOCUS_NEXT, "DVTMP_FOCUS_NEXT"},
+	{"focusnextnm", FOCUS_NEXT_MIN, "DVTMP_FOCUS_NEXT_MIN"},
+	{"focusprevnm", FOCUS_PREV_MIN, "DVTMP_FOCUS_PREV_MINV"},
+	{"focusprev", FOCUS_PREV, "DVTMP_FOCUS_PREV"},
+	{"setlayout_vertical", TILE_VERTICAL, "DVTMP_TILE_VERTICAL"},
+	{"setlayout_grid", TILE_GRID, "DVTMP_TILE_GRID"},
+	{"setlayout_bottom", TILE_BOTTOM, "DVTMP_TILE_BOTTOM"},
+	{"max_window", MAX_WINDOW, "DVTMP_MAX_WINDOW"},
+	{"toggle_layouts", TOGGLE_LAYOUTS, "DVTMP_TOGGLE_LAYOUTS"},
+	{"incmaster", INCR_WINDOWS, "DVTMP_INCR_WINDOWS"},
+	{"decrmaster", DECR_WINDOWS, "DVTMP_DECR_WINDOWS"},
+	{"decr_master", MASTER_DECR, "DVTMP_MASTER_DECR"},
+	{"incr_master", MASTER_INCR, "DVTMP_MASTER_INCR"},
+	{"toggleminimize", TOGGLE_MIN, "DVTMP_TOGGLE_MIN"},
+	{"togglebar", SHOW_HIDE_STATUS, "DVTMP_SHOW_HIDE_STATUS"},
+	{"togglebarpos", TOGGLE_STATUS_LOC, "DVTMP_TOGGLE_STATUS_LOC"},
+	{"togglemouse", TOGGLE_MOUSE, "DVTMP_TOGGLE_MOUSE"},
+	{"zoom", ZOOM1, "DVTMP_ZOOM"},
+	{"focuslast", FOCUS_PREV_WINDOW, "DVTMP_FOCUS_PREV_WINDOW"},
+	{"toggler_multiplex", MULTIPLEX_TOGGLE, "DVTMP_MULTIPLEX_TOGGLE"},
+	{"redraw1", REDRAW_CTL_L, "DVTMP_REDRAW1"},
+	{"redraw2", REDRAW_R, "DVTMP_REDRAW2"},
+	{"copymode1", COPY_MODE1, "DVTMP_COPY_MODE1"},
+	{"copymode2", COPY_MODE2, "DVTMP_COPY_MODE2"},
+	{"paste", PASTE, "DVTMP_PASTE"},
+	{"view", VIEW, "DVTMP_VIEW"}};
 
 KeyBinding *obindings;
 
 /* global variables */
-static const char *dvtm_name = "dvtm-config";
+static const char *dvtm_name = "dvtmp";
 Screen screen = { .mfact = MFACT, .nmaster = NMASTER, .history = SCROLL_HISTORY };
 static Client *stack = NULL;
 static Client *sel = NULL;
@@ -1032,7 +1032,7 @@ create(const char *args[]) {
 	const char *pargs[4] = { shell, NULL };
 	char buf[8], *cwd = NULL;
 	const char *env[] = {
-		"DVTM_CONFIG_WINDOW_ID", buf,
+		"DVTMP_WINDOW_ID", buf,
 		NULL
 	};
 
@@ -1088,7 +1088,7 @@ copymode(const char *args[]) {
 	if (!(sel->editor = vt_create(sel->h - sel->has_title_line, sel->w, 0)))
 		return;
 
-	char *ed = getenv("DVTM_CONFIG_EDITOR");
+	char *ed = getenv("DVTMP_EDITOR");
 	int *to = &sel->editor_fds[0], *from = NULL;
 	sel->editor_fds[0] = sel->editor_fds[1] = -1;
 
@@ -1678,7 +1678,7 @@ open_or_create_fifo(const char *name, const char **name_created) {
 static void
 usage(void) {
 	cleanup();
-	eprint("usage: dvtm-config [-v] [-M] [-m mod] [-d delay] [-h lines] [-t title] "
+	eprint("usage: dvtmp [-v] [-M] [-m mod] [-d delay] [-h lines] [-t title] "
 	       "[-s status-fifo] [-c cmd-fifo] [cmd...]\n");
 	exit(EXIT_FAILURE);
 }
@@ -1716,7 +1716,7 @@ parse_args(int argc, char *argv[]) {
 			usage();
 		switch (argv[arg][1]) {
 			case 'v':
-				puts("dvtm-config-"VERSION" © 2007-2016 Marc André Tanner");
+				puts("dvtmp-"VERSION" © 2007-2016 Marc André Tanner");
 				exit(EXIT_SUCCESS);
 			case 'M':
 				mouse_events_enabled = !mouse_events_enabled;
@@ -1747,7 +1747,7 @@ parse_args(int argc, char *argv[]) {
 				cmdfifo.fd = open_or_create_fifo(argv[++arg], &cmdfifo.file);
 				if (!(fifo = realpath(argv[arg], NULL)))
 					error("%s\n", strerror(errno));
-				setenv("DVTM_CONFIG_CMD_FIFO", fifo, 1);
+				setenv("DVTMP_CMD_FIFO", fifo, 1);
 				break;
 			}
 			default:
@@ -1782,7 +1782,7 @@ main(int argc, char *argv[]) {
 	obindings = malloc(sizeof(bindings));
 	memcpy(obindings, bindings, sizeof(bindings));
 
-	setenv("DVTM_CONFIG", VERSION, 1);
+	setenv("DVTMP", VERSION, 1);
 	if (!parse_args(argc, argv)) {
 		setup();
 		startup(NULL);

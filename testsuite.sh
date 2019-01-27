@@ -2,9 +2,9 @@
 
 MOD="" # CTRL+g
 ESC="" # \e
-DVTM_CONFIG="./dvtm-config"
-export DVTM_CONFIG_EDITOR="vis"
-LOG="dvtm-config.log"
+DVTMP="./dvtmp"
+export DVTMP_EDITOR="vis"
+LOG="dvtmp.log"
 TEST_LOG="$0.log"
 UTF8_TEST_FN="UTF-8-demo.txt"
 UTF8_TEST_URL="http://www.cl.cam.ac.uk/~mgk25/ucs/examples/$UTF8_TEST_FN"
@@ -15,14 +15,14 @@ if [ "$1" = "--debug" ] ; then
 else
 	keep_log=0
 fi
-[ ! -z "$1" ] && DVTM_CONFIG="$1"
-[ ! -x "$DVTM_CONFIG" ] && echo "usage: [--debug] $0 path-to-dvtm-config-binary" && exit 1
+[ ! -z "$1" ] && DVTMP="$1"
+[ ! -x "$DVTMP" ] && echo "usage: [--debug] $0 path-to-dvtmp-binary" && exit 1
 
-dvtm_config_input() {
+dvtmp_input() {
 	printf "$1"
 }
 
-dvtm_config_cmd() {
+dvtmp_cmd() {
 	printf "${MOD}$1"
 	sleep 1
 }
@@ -38,16 +38,16 @@ test_copymode() { # requires wget, diff, vis
 	[ ! -e "$FILENAME" ] && (wget "$UTF8_TEST_URL" -O "$FILENAME" > /dev/null 2>&1 || return 1)
 	sleep 1
 	sh_cmd "cat $FILENAME"
-	dvtm_config_cmd 'e'
-	dvtm_config_input "?UTF-8 encoded\n"
-	dvtm_config_input '^kvG1k$'
-	dvtm_config_input ":wq!\n"
+	dvtmp_cmd 'e'
+	dvtmp_input "?UTF-8 encoded\n"
+	dvtmp_input '^kvG1k$'
+	dvtmp_input ":wq!\n"
 	sleep 1
 	sh_cmd "cat <<'EOF' > $COPY"
-	dvtm_config_cmd 'p'
+	dvtmp_cmd 'p'
 	sh_cmd 'EOF'
 	while [ ! -r "$COPY" ]; do sleep 1; done;
-	dvtm_config_input "exit\n"
+	dvtmp_input "exit\n"
 	diff -u "$FILENAME" "$COPY" 1>&2
 	local RESULT=$?
 	rm -f "$COPY"
@@ -60,10 +60,10 @@ if ! which vis > /dev/null 2>&1 ; then
 fi
 
 {
-	echo "Testing $DVTM_CONFIG" 1>&2
-	$DVTM_CONFIG -v 1>&2
+	echo "Testing $DVTMP" 1>&2
+	$DVTMP -v 1>&2
 	test_copymode && echo "copymode: OK" 1>&2 || echo "copymode: FAIL" 1>&2;
-} 2> "$TEST_LOG" | $DVTM_CONFIG -m ^g 2> $LOG
+} 2> "$TEST_LOG" | $DVTMP -m ^g 2> $LOG
 
 cat "$TEST_LOG"
 if [ $? -eq 0 -a $keep_log -eq 0 ] ; then

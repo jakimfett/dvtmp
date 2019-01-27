@@ -1,16 +1,16 @@
 include config.mk
-PKG_NAME = dvtm-config
+PKG_NAME = dvtmp
 
 RPM_DIRS = BUILD RPMS SOURCES SPECS SRPMS
 
-SRC = dvtm-config.c vt.c ini.c
-DIST_FILES = LICENSE Makefile README.md testsuite.sh config.def.h config.mk \
+SRC = dvtmp.c vt.c ini.c
+DIST_FILES = LICENSE Makefile README.md testsuite1.py config.def.h config.mk \
 		vt.h forkpty-aix.c forkpty-sunos.c tile.c bstack.c \
 		ini.h tstack.c vstack.c grid.c fullscreen.c fibonacci.c \
-		dvtm-config-status dvtm-config.info dvtm-config.1
+		dvtmp-status dvtmp.info dvtmp.1
 OBJ = ${SRC:.c=.o}
 
-all: clean options dvtm-config
+all: clean options dvtmp
 
 options:
 	@echo $(PKG_NAME) build options:
@@ -27,7 +27,7 @@ config.h:
 
 ${OBJ}: config.h config.mk
 
-dvtm-config: ${OBJ}
+dvtmp: ${OBJ}
 	@echo CC -o $@
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
 
@@ -39,7 +39,7 @@ clean-rpm:
 
 clean:
 	@echo cleaning
-	@rm -f dvtm-config ${OBJ} $(PKG_NAME)-${VERSION}.tar.gz
+	@rm -f dvtmp ${OBJ} $(PKG_NAME)-${VERSION}.tar.gz
 	@rm -rf $(RPM_DIRS)
 
 dist: clean
@@ -63,30 +63,30 @@ dist-rpm: clean $(RPM_DIRS)/
 	@gzip ~/rpmbuild/SOURCES/$(PKG_NAME)-${VERSION}.tar
 	@rm -rf $(PKG_NAME)-${VERSION}
 	@cp $(PKG_NAME).spec ~/rpmbuild/SPECS
-	@cp dvtm-config-0.16-build.patch  ~/rpmbuild/SOURCES
+	@cp dvtmp-0.16-build.patch  ~/rpmbuild/SOURCES
 	@rpmbuild -v -bb --clean ~/rpmbuild/SPECS/$(PKG_NAME).spec
 
-install: dvtm-config
+install: dvtmp
 	@echo stripping executable
-	@${STRIP} dvtm-config
+	@${STRIP} dvtmp
 	@echo installing executable file to ${DESTDIR}${PREFIX}/bin
 	@mkdir -p ${DESTDIR}${PREFIX}/bin
-	@cp -f dvtm-config ${DESTDIR}${PREFIX}/bin
-	@chmod 755 ${DESTDIR}${PREFIX}/bin/dvtm-config
-	@cp -f dvtm-config-status ${DESTDIR}${PREFIX}/bin
-	@chmod 755 ${DESTDIR}${PREFIX}/bin/dvtm-config-status
+	@cp -f dvtmp ${DESTDIR}${PREFIX}/bin
+	@chmod 755 ${DESTDIR}${PREFIX}/bin/dvtmp
+	@cp -f dvtmp-status ${DESTDIR}${PREFIX}/bin
+	@chmod 755 ${DESTDIR}${PREFIX}/bin/dvtmp-status
 	@echo installing manual page to ${DESTDIR}${MANPREFIX}/man1
 	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
-	@sed "s/VERSION/${VERSION}/g" < dvtm-config.1 > ${DESTDIR}${MANPREFIX}/man1/dvtm-config.1
-	@chmod 644 ${DESTDIR}${MANPREFIX}/man1/dvtm-config.1
+	@sed "s/VERSION/${VERSION}/g" < dvtmp.1 > ${DESTDIR}${MANPREFIX}/man1/dvtmp.1
+	@chmod 644 ${DESTDIR}${MANPREFIX}/man1/dvtmp.1
 	@echo installing terminfo description
-	@TERMINFO=${TERMINFO} tic -s dvtm-config.info
+	@TERMINFO=${TERMINFO} tic -s dvtmp.info
 
 uninstall:
 	@echo removing executable file from ${DESTDIR}${PREFIX}/bin
-	@rm -f ${DESTDIR}${PREFIX}/bin/dvtm-config
-	@rm -f ${DESTDIR}${PREFIX}/bin/dvtm-config-status
+	@rm -f ${DESTDIR}${PREFIX}/bin/dvtmp
+	@rm -f ${DESTDIR}${PREFIX}/bin/dvtmp-status
 	@echo removing manual page from ${DESTDIR}${MANPREFIX}/man1
-	@rm -f ${DESTDIR}${MANPREFIX}/man1/dvtm-config.1
+	@rm -f ${DESTDIR}${MANPREFIX}/man1/dvtmp.1
 
 .PHONY: all options clean dist install uninstall debug
