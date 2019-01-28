@@ -35,6 +35,7 @@
 # include <termios.h>
 #endif
 #include "vt.h"
+#include "ini.h"
 
 #ifdef PDCURSES
 int ESCDELAY;
@@ -45,6 +46,8 @@ int ESCDELAY;
 #endif
 
 #define ZOOM_EVN "DVTMP_ZOOM"
+#define READ_INI_USER "new"
+#define MERGE_INI_USER "old"
 
 typedef struct {
 	float mfact;
@@ -166,6 +169,27 @@ typedef struct {
 	bool color;
 } Editor;
 
+/*
+ * Structure containing main configuration loaded from config file.
+ */
+typedef enum { SET_DEFAULT, SET_ARG, SET_ENV, SET_INI} HowSet;
+typedef enum { ORIG_TITLE_ALGORITHM, INI_TGVAUGN, INI_SUPPOSITION} TitleAlgorithm;
+typedef struct {
+	char separator[256];
+	HowSet sep_set;
+	char title_fmt[256];
+	HowSet title_fmt_set;
+	TitleAlgorithm title_alg;
+	HowSet alg_set;
+} Configuration;
+
+typedef struct {
+	const char *name;
+	char keyb;
+	const char *envn;
+	HowSet how_set;
+} EnvMod;
+
 #define LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
 #define MAX(x, y)   ((x) > (y) ? (x) : (y))
 #define MIN(x, y)   ((x) < (y) ? (x) : (y))
@@ -176,7 +200,7 @@ typedef struct {
 #else
  #define debug eprint
 #endif
-
+#define TITLE_BUF_LEN 1024
 /* commands for use by keybindings */
 static void create(const char *args[]);
 static void copymode(const char *args[]);
@@ -190,6 +214,7 @@ static void killclient(const char *args[]);
 static void paste(const char *args[]);
 static void quit(const char *args[]);
 static void redraw(const char *args[]);
+static void readini(const char *args[]);
 static void scrollback(const char *args[]);
 static void send(const char *args[]);
 static void setlayout(const char *args[]);
@@ -218,51 +243,49 @@ static void mouse_zoom(const char *args[]);
 static Client* nextvisible(Client *c);
 static void focus(Client *c);
 static void resize(Client *c, int x, int y, int w, int h);
+Configuration config;
 extern Screen screen;
 static unsigned int waw, wah, wax, way;
 static Client *clients = NULL;
-static char *title;
+static char *title = NULL;
 
 #include "config.h"
 
-struct env_mod_t {
-	const char *name;
-	char keyb;
-	const char *envn;
-};
-struct env_mod_t env_mods[] = {
-	{"create", CREATE, "DVTMP_CREATE"},
-	{"create_cwd", CREATE_CWD, "DVTMP_CREATE_CWD"},
-	{"kill_client", KILL_CLIENT, "DVTMP_KILL_CLIENT"},
-	{"focusnext", FOCUS_NEXT, "DVTMP_FOCUS_NEXT"},
-	{"focusnextnm", FOCUS_NEXT_MIN, "DVTMP_FOCUS_NEXT_MIN"},
-	{"focusprevnm", FOCUS_PREV_MIN, "DVTMP_FOCUS_PREV_MINV"},
-	{"focusprev", FOCUS_PREV, "DVTMP_FOCUS_PREV"},
-	{"setlayout_vertical", TILE_VERTICAL, "DVTMP_TILE_VERTICAL"},
-	{"setlayout_grid", TILE_GRID, "DVTMP_TILE_GRID"},
-	{"setlayout_bottom", TILE_BOTTOM, "DVTMP_TILE_BOTTOM"},
-	{"max_window", MAX_WINDOW, "DVTMP_MAX_WINDOW"},
-	{"toggle_layouts", TOGGLE_LAYOUTS, "DVTMP_TOGGLE_LAYOUTS"},
-	{"incmaster", INCR_WINDOWS, "DVTMP_INCR_WINDOWS"},
-	{"decrmaster", DECR_WINDOWS, "DVTMP_DECR_WINDOWS"},
-	{"decr_master", MASTER_DECR, "DVTMP_MASTER_DECR"},
-	{"incr_master", MASTER_INCR, "DVTMP_MASTER_INCR"},
-	{"toggleminimize", TOGGLE_MIN, "DVTMP_TOGGLE_MIN"},
-	{"togglebar", SHOW_HIDE_STATUS, "DVTMP_SHOW_HIDE_STATUS"},
-	{"togglebarpos", TOGGLE_STATUS_LOC, "DVTMP_TOGGLE_STATUS_LOC"},
-	{"togglemouse", TOGGLE_MOUSE, "DVTMP_TOGGLE_MOUSE"},
-	{"zoom", ZOOM1, "DVTMP_ZOOM"},
-	{"focuslast", FOCUS_PREV_WINDOW, "DVTMP_FOCUS_PREV_WINDOW"},
-	{"toggler_multiplex", MULTIPLEX_TOGGLE, "DVTMP_MULTIPLEX_TOGGLE"},
-	{"redraw1", REDRAW_CTL_L, "DVTMP_REDRAW1"},
-	{"redraw2", REDRAW_R, "DVTMP_REDRAW2"},
-	{"copymode1", COPY_MODE1, "DVTMP_COPY_MODE1"},
-	{"copymode2", COPY_MODE2, "DVTMP_COPY_MODE2"},
-	{"paste", PASTE, "DVTMP_PASTE"},
-	{"view", VIEW, "DVTMP_VIEW"},
-	{"toggleview", TOGGLE_VIEW, "DVTMP_TOGGLE_VIEW"},
-	{"tag", TAG_KEY, "DVTMP_TAG"},
-	{"toggletag", TOGGLE_TAG_KEY, "DVTMP_TOGGLE_TAG"}};
+EnvMod env_mods[] = {
+	{"create", CREATE, "DVTMP_CREATE", SET_DEFAULT},
+	{"create_cwd", CREATE_CWD, "DVTMP_CREATE_CWD", SET_DEFAULT},
+	{"kill_client", KILL_CLIENT, "DVTMP_KILL_CLIENT", SET_DEFAULT},
+	{"focusnext", FOCUS_NEXT, "DVTMP_FOCUS_NEXT", SET_DEFAULT},
+	{"focusnextnm", FOCUS_NEXT_MIN, "DVTMP_FOCUS_NEXT_MIN", SET_DEFAULT},
+	{"focusprevnm", FOCUS_PREV_MIN, "DVTMP_FOCUS_PREV_MINV", SET_DEFAULT},
+	{"focusprev", FOCUS_PREV, "DVTMP_FOCUS_PREV", SET_DEFAULT},
+	{"setlayout_vertical", TILE_VERTICAL, "DVTMP_TILE_VERTICAL", SET_DEFAULT},
+	{"setlayout_grid", TILE_GRID, "DVTMP_TILE_GRID", SET_DEFAULT},
+	{"setlayout_bottom", TILE_BOTTOM, "DVTMP_TILE_BOTTOM", SET_DEFAULT},
+	{"max_window", MAX_WINDOW, "DVTMP_MAX_WINDOW", SET_DEFAULT},
+	{"toggle_layouts", TOGGLE_LAYOUTS, "DVTMP_TOGGLE_LAYOUTS", SET_DEFAULT},
+	{"incmaster", INCR_WINDOWS, "DVTMP_INCR_WINDOWS", SET_DEFAULT},
+	{"decrmaster", DECR_WINDOWS, "DVTMP_DECR_WINDOWS", SET_DEFAULT},
+	{"decr_master", MASTER_DECR, "DVTMP_MASTER_DECR", SET_DEFAULT},
+	{"incr_master", MASTER_INCR, "DVTMP_MASTER_INCR", SET_DEFAULT},
+	{"toggleminimize", TOGGLE_MIN, "DVTMP_TOGGLE_MIN", SET_DEFAULT},
+	{"togglebar", SHOW_HIDE_STATUS, "DVTMP_SHOW_HIDE_STATUS", SET_DEFAULT},
+	{"togglebarpos", TOGGLE_STATUS_LOC, "DVTMP_TOGGLE_STATUS_LOC", SET_DEFAULT},
+	{"togglemouse", TOGGLE_MOUSE, "DVTMP_TOGGLE_MOUSE", SET_DEFAULT},
+	{"zoom", ZOOM1, "DVTMP_ZOOM", SET_DEFAULT},
+	{"focuslast", FOCUS_PREV_WINDOW, "DVTMP_FOCUS_PREV_WINDOW", SET_DEFAULT},
+	{"toggler_multiplex", MULTIPLEX_TOGGLE, "DVTMP_MULTIPLEX_TOGGLE", SET_DEFAULT},
+	{"redraw1", REDRAW_CTL_L, "DVTMP_REDRAW1", SET_DEFAULT},
+	{"redraw2", REDRAW_R, "DVTMP_REDRAW2", SET_DEFAULT},
+	{"copymode1", COPY_MODE1, "DVTMP_COPY_MODE1", SET_DEFAULT},
+	{"copymode2", COPY_MODE2, "DVTMP_COPY_MODE2", SET_DEFAULT},
+	{"paste", PASTE, "DVTMP_PASTE", SET_DEFAULT},
+	{"view", VIEW, "DVTMP_VIEW", SET_DEFAULT},
+	{"toggleview", TOGGLE_VIEW, "DVTMP_TOGGLE_VIEW", SET_DEFAULT},
+	{"tag", TAG_KEY, "DVTMP_TAG", SET_DEFAULT},
+	{"toggletag", TOGGLE_TAG_KEY, "DVTMP_TOGGLE_TAG", SET_DEFAULT}};
+
+unsigned int elen = sizeof(env_mods) / sizeof(EnvMod);
 
 KeyBinding *obindings;
 
@@ -283,6 +306,14 @@ static const char *shell;
 static Register copyreg;
 static volatile sig_atomic_t running = true;
 static bool runinall = false;
+#define countof(arr) (sizeof(arr) / sizeof((arr)[0]))
+#define sstrlen(str) (sizeof(str) - 1)
+#define max(x, y) ((x) > (y) ? (x) : (y))
+#define min(x, y) ((x) < (y) ? (x) : (y))
+
+#ifdef LOGNAME
+static FILE *logfn = NULL;
+#endif
 
 static void
 eprint(const char *errstr, ...) {
@@ -429,6 +460,7 @@ static void
 draw_border(Client *c) {
 	char t = '\0';
 	int x, y, maxlen, attrs = NORMAL_ATTR;
+	char tbuf[TITLE_BUF_LEN + 1];
 
 	if (!show_border())
 		return;
@@ -440,7 +472,31 @@ draw_border(Client *c) {
 	wattrset(c->window, attrs);
 	getyx(c->window, y, x);
 	mvwhline(c->window, 0, 0, ACS_HLINE, c->w);
-	maxlen = c->w - 10;
+	char *act_title = *c->title ? c->title : "";
+	char *act_sep = *c->title ? config.separator : "";
+	snprintf(tbuf, TITLE_BUF_LEN, config.title_fmt, act_title, act_sep, c->order);
+	#ifdef LOGNAME
+	fprintf(logfn, "tbuf =%ld,c->w=%d.\n", strlen(tbuf), c->w);
+	fflush(logfn);
+	if (strlen(tbuf) > c->w) {
+		fprintf(logfn, "tbuf too big.\n");
+		fflush(logfn);
+	}
+	#endif
+
+	if (config.title_alg == INI_TGVAUGN) {
+		maxlen = c->w - (2 + strlen(config.title_fmt) - sstrlen("%s%sd")  + strlen(config.separator) + 2);
+	} else if (config.title_alg == ORIG_TITLE_ALGORITHM) {
+		maxlen = c->w - 10;
+	} else {
+		maxlen = c->w - strlen(tbuf);
+	}
+
+	#ifdef LOGNAME
+	fprintf(logfn, "c->order=%d,c->w=%d, sizeof(c->title)=%ld,strlen(tbuf)=%ld,maxlen=%d,act_title=%s,act_sep=%s\n", 
+		c->order, c->w, sizeof(c->title), strlen(tbuf), maxlen, act_title, act_sep);
+	fflush(logfn);
+	#endif
 	if (maxlen < 0)
 		maxlen = 0;
 	if ((size_t)maxlen < sizeof(c->title)) {
@@ -448,9 +504,9 @@ draw_border(Client *c) {
 		c->title[maxlen] = '\0';
 	}
 
-	mvwprintw(c->window, 0, 2, "[%s%s#%d]",
+	mvwprintw(c->window, 0, 2, config.title_fmt,
 	          *c->title ? c->title : "",
-	          *c->title ? " | " : "",
+	          act_sep,
 	          c->order);
 	if (t)
 		c->title[maxlen] = t;
@@ -939,9 +995,87 @@ getshell(void) {
 }
 
 static void
+upd_char_bindings(int ix_key, unsigned char curr_key, const char *skey) {
+	char *nkey = strdup(skey);
+	if (nkey[0] == '^' && nkey[1])
+		*nkey = CTRL(nkey[1]);
+	for (unsigned int b = 0; b < LENGTH(bindings); b++) {
+		if (obindings[b].keys[ix_key] == curr_key)
+			bindings[b].keys[ix_key] = *nkey;
+	}
+	free(nkey);
+}
+
+static void
+ini_strncpy(char *dest, const char *src, unsigned int len) {
+	if (strlen(src)>1 && strlen(src)<len && src[0]=='"' && src[strlen(src)-1]=='"')
+		strncpy(dest, src+1, strlen(src)-2);
+	else
+		strncpy(dest, src, len);
+}
+
+static void
+ini_load_defaults() {
+	config.sep_set = SET_DEFAULT;
+	config.title_fmt_set = SET_DEFAULT;
+	config.alg_set = SET_DEFAULT;
+	ini_strncpy(config.separator, SEPARATOR, 255);
+	ini_strncpy(config.title_fmt, TITLE_FMT, 255);
+	config.title_alg = INI_TGVAUGN;
+}
+
+static int
+ini_handler(void *user, const char *section,
+		const char *name, const char *value) {
+
+	if (strcmp(section,"main")==0) {
+		if (strcmp(name, "title_fmt")==0) {
+			ini_strncpy(config.title_fmt, value, 255);
+		} else if (strcmp(name, "history")==0) {
+			screen.history = atoi(value);
+		} else if (strcmp(name, "delay")==0) {
+			set_escdelay(atoi(value));
+		} else if (strcmp(name, "separator")==0) {
+			ini_strncpy(config.separator, value, 255);
+		} else if (strcmp(name, "mod")==0) {
+			upd_char_bindings(0, MOD, value);
+		}
+	} else if (strcmp(section, "keys")==0) {
+		for (unsigned int b = 0; b < elen; b++) {
+			if (!strcmp(env_mods[b].name, name)) {
+				upd_char_bindings(1, env_mods[b].keyb, value);
+				env_mods[b].how_set = SET_INI;
+				break;
+			}
+		}
+	}
+	return 0;
+}
+
+void eval_envs(void) {
+	
+	if (!getenv("ESCDELAY"))
+		set_escdelay(100);
+
+	for (unsigned int ic = 0 ; ic < elen ; ic++) {
+		char *nkb = getenv(env_mods[ic].envn);
+		if (nkb != NULL) {
+			upd_char_bindings(1, env_mods[ic].keyb, nkb);
+			if (!strcmp(env_mods[ic].envn, ZOOM_EVN)) {
+				upd_char_bindings(1, ZOOM2, nkb);
+			}
+		}
+	}
+	
+}
+
+
+static void
 setup(void) {
+
 	shell = getshell();
 	setlocale(LC_CTYPE, "");
+
 	initscr();
 	start_color();
 	noecho();
@@ -1257,6 +1391,40 @@ redraw(const char *args[]) {
 		}
 	}
 	resize_screen();
+}
+
+static void
+readini(const char *args[]) {
+	char iniFileName[256];
+
+	// Read config file if present:
+	char *home_dir = getenv("HOME");
+	// Actually the user tells the handler to merge or read i.e. take
+	// whatever is in the ini file.
+	char *ini_user = NULL;
+	if (args != NULL) {
+		obindings = malloc(sizeof(bindings));
+		memcpy(obindings, bindings, sizeof(bindings));
+		ini_user = (void *)args;
+	} else {
+		ini_user = (void *)READ_INI_USER;
+	}
+
+	if (home_dir != NULL) {
+		snprintf(iniFileName, 255, "%s/.dvtmp/config", home_dir);
+		if (access(iniFileName, R_OK)==0) {
+			printf("Config file found.\n");
+			if (ini_parse(iniFileName, ini_handler, NULL) < 0) {
+				fprintf(stderr, "Error reading config file.");
+				exit(1);
+			}
+		}
+	}
+	if (args != NULL) {
+		free(obindings);
+		obindings = NULL;
+	}
+
 }
 
 static void
@@ -1682,18 +1850,8 @@ static void
 usage(void) {
 	cleanup();
 	eprint("usage: dvtmp [-v] [-M] [-m mod] [-d delay] [-h lines] [-t title] "
-	       "[-s status-fifo] [-c cmd-fifo] [cmd...]\n");
+	       "[-g 0 throug 2] [-s status-fifo] [-c cmd-fifo] [cmd...]\n");
 	exit(EXIT_FAILURE);
-}
-
-void upd_bindings(int ix_key, char curr_key, char *skey) {
-	char *nkey = skey;
-	if (nkey[0] == '^' && nkey[1])
-		*nkey = CTRL(nkey[1]);
-	for (unsigned int b = 0; b < LENGTH(bindings); b++) {
-		if (obindings[b].keys[ix_key] == curr_key)
-			bindings[b].keys[ix_key] = *nkey;
-	}
 }
 
 static bool
@@ -1703,8 +1861,6 @@ parse_args(int argc, char *argv[]) {
 
 	if (name && (name = strrchr(name, '/')))
 		dvtm_name = name + 1;
-	if (!getenv("ESCDELAY"))
-		set_escdelay(100);
 	for (int arg = 1; arg < argc; arg++) {
 		if (argv[arg][0] != '-') {
 			const char *args[] = { argv[arg], NULL, NULL };
@@ -1725,7 +1881,7 @@ parse_args(int argc, char *argv[]) {
 				mouse_events_enabled = !mouse_events_enabled;
 				break;
 			case 'm': {
-				upd_bindings(0, MOD, argv[++arg]);
+				upd_char_bindings(0, MOD, argv[++arg]);
 				break;
 			}
 			case 'd':
@@ -1737,6 +1893,24 @@ parse_args(int argc, char *argv[]) {
 				break;
 			case 'h':
 				screen.history = atoi(argv[++arg]);
+				break;
+			case 'g':
+				{
+					int alg = atoi(argv[++arg]);
+					switch(alg) {
+						case 0:
+							config.title_alg = ORIG_TITLE_ALGORITHM;
+							break;
+						case 1:
+							config.title_alg = INI_TGVAUGN;
+							break;
+						case 2:
+							config.title_alg = INI_SUPPOSITION;
+							break;
+						default:
+							usage();
+					}
+				}
 				break;
 			case 't':
 				title = argv[++arg];
@@ -1760,21 +1934,6 @@ parse_args(int argc, char *argv[]) {
 	return init;
 }
 
-void eval_envs() {
-	
-	int elen = sizeof(env_mods) / sizeof(struct env_mod_t);
-	for (int ic = 0 ; ic < elen ; ic++) {
-		char *nkb = getenv(env_mods[ic].envn);
-		if (nkb != NULL) {
-			upd_bindings(1, env_mods[ic].keyb, nkb);
-			if (!strcmp(env_mods[ic].envn, ZOOM_EVN)) {
-				upd_bindings(1, ZOOM2, nkb);
-			}
-		}
-	}
-	
-}
-
 int
 main(int argc, char *argv[]) {
 	KeyCombo keys;
@@ -1782,16 +1941,27 @@ main(int argc, char *argv[]) {
 	memset(keys, 0, sizeof(keys));
 	sigset_t emptyset, blockset;
 
+	//This is freed in setup which is always called.
 	obindings = malloc(sizeof(bindings));
 	memcpy(obindings, bindings, sizeof(bindings));
+	#ifdef LOGNAME
+	logfn = fopen(LOGNAME, "w");
+	printf("Opening %s\n", LOGNAME);
+	fprintf(logfn, "bindings size %ld\n", sizeof(bindings));
+	fflush(logfn);
+	#endif
 
 	setenv("DVTMP", VERSION, 1);
+	// Load default configration from config.h definitions:
+	ini_load_defaults();
+	
+	readini((const char **)NULL);
+	eval_envs();
+
 	if (!parse_args(argc, argv)) {
 		setup();
 		startup(NULL);
 	}
-	eval_envs();
-	free(obindings);
 
 	sigemptyset(&emptyset);
 	sigemptyset(&blockset);
@@ -1905,5 +2075,10 @@ main(int argc, char *argv[]) {
 	}
 
 	cleanup();
+	#ifdef LOGNAME
+	if (logfn != NULL) {
+		fclose(logfn);
+	}
+	#endif
 	return 0;
 }

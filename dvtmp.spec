@@ -1,5 +1,5 @@
 Name:           dvtmp
-Version:        0.16.5b
+Version:        0.16.6b
 Release:        5%{?dist}
 Summary:        Configurable tiling window management for the console
 License:        MIT and ISC
@@ -18,7 +18,8 @@ BuildRequires:  sed
 dvtmp brings the concept of tiling window management, popularized by
 X11-window managers like dwm to the console. As a console window
 manager it tries to make it easy to work with multiple console based
-programs like vim, mutt, cmus or irssi.
+programs like vim, mutt, cmus or irssi. It can be customized with either
+environment variables or an ini file.
 
 %prep
 %setup -q

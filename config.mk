@@ -1,5 +1,6 @@
-# dvtmp version
-VERSION = 0.16.5b
+# dvtm version
+BASE_VERSION = 0.16
+VERSION = ${BASE_VERSION}.6b
 
 # Customize below to fit your system
 
@@ -9,9 +10,9 @@ MANPREFIX = ${PREFIX}/share/man
 # leave empty to install into your home folder
 TERMINFO := ${DESTDIR}${PREFIX}/share/terminfo
 
-INCS = -I.
-LIBS = -lc -lutil -lncursesw
-CPPFLAGS = -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700 -D_XOPEN_SOURCE_EXTENDED
+INCS ?= -I.
+LIBS ?= -lc -lutil -lncursesw
+CPPFLAGS ?= -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700 -D_XOPEN_SOURCE_EXTENDED
 CFLAGS += -std=c99 ${INCS} -DVERSION=\"${VERSION}\" -DNDEBUG ${CPPFLAGS}
 LDFLAGS += ${LIBS}
 

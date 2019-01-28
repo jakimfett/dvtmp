@@ -1,0 +1,2 @@
+set -o vifile
+export PS1='test-prompt:'

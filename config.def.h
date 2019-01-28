@@ -41,6 +41,12 @@ static Color colors[] = {
 #define MFACT 0.5
 /* number of clients in master area */
 #define NMASTER 1
+/* separator between window title and window number */
+#define SEPARATOR " | "
+/* printf format string for the window title, first %s
+ * is replaced by the title, second %s is replaced by
+ * the SEPARATOR, %d stands for the window number */
+#define TITLE_FMT "[%s%s#%d]"
 /* scroll back buffer size in lines */
 #define SCROLL_HISTORY 500
 /* printf format string for the tag in the status bar */
@@ -96,6 +102,8 @@ static Layout layouts[] = {
 #define MULTIPLEX_TOGGLE  'a'
 #define REDRAW_CTL_L  CTRL('L')
 #define REDRAW_R  'r'
+#define READ_INI  CTRL('r')
+#define MERGE_INI  CTRL('m')
 #define COPY_MODE1  'e'
 #define COPY_MODE2  '/'
 #define PASTE  'p'
@@ -148,6 +156,8 @@ static KeyBinding bindings[] = {
 	{ { MOD, MULTIPLEX_TOGGLE,          }, { togglerunall,   { NULL }                    } },
 	{ { MOD, REDRAW_CTL_L,    }, { redraw,         { NULL }                    } },
 	{ { MOD, REDRAW_R,          }, { redraw,         { NULL }                    } },
+	{ { MOD, READ_INI,          }, { readini,         { "1" }                    } },
+	{ { MOD, MERGE_INI,          }, { readini,         { "0" }                    } },
 	{ { MOD, COPY_MODE1,          }, { copymode,       { NULL }                    } },
 	{ { MOD, COPY_MODE2,          }, { copymode,       { "/" }                     } },
 	{ { MOD, PASTE,          }, { paste,          { NULL }                    } },
@@ -234,7 +244,7 @@ static char const * const keytable[] = {
 	/* add your custom key escape sequences */
 };
 
-/* editor to use for copy mode. If neither of DVTP_EDITOR, EDITOR and PAGER is
+/* editor to use for copy mode. If neither of DVTMP_EDITOR, EDITOR and PAGER is
  * set the first entry is chosen. Otherwise the array is consulted for supported
  * options. A %d in argv is replaced by the line number at which the file should
  * be opened. If filter is true the editor is expected to work even if stdout is
