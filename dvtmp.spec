@@ -1,10 +1,10 @@
 Name:           dvtmp
-Version:        0.16.3b
+Version:        0.16.4b
 Release:        5%{?dist}
 Summary:        Configurable tiling window management for the console
 License:        MIT and ISC
-URL:            https://github.com/taichifan/dvtmp
-Source0:        http://www.brain-dump.org/projects/%{name}/%{name}-%{version}.tar.gz
+URL:            https://github.com/taichifan/%{name}
+Source0:        https://github.com/taichifan/%{name}/releases/%{name}-%{version}.tar.gz
 Patch0:         %{name}-0.16-build.patch
 BuildRequires:  binutils
 BuildRequires:  coreutils

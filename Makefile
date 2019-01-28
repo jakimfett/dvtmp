@@ -4,7 +4,7 @@ PKG_NAME = dvtmp
 RPM_DIRS = BUILD RPMS SOURCES SPECS SRPMS
 
 SRC = dvtmp.c vt.c ini.c
-DIST_FILES = LICENSE Makefile README.md testsuite1.py config.def.h config.mk \
+DIST_FILES = LICENSE Makefile README.md testsuite.sh config.def.h config.mk \
 		vt.h forkpty-aix.c forkpty-sunos.c tile.c bstack.c \
 		ini.h tstack.c vstack.c grid.c fullscreen.c fibonacci.c \
 		dvtmp-status dvtmp.info dvtmp.1

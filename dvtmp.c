@@ -259,7 +259,10 @@ struct env_mod_t env_mods[] = {
 	{"copymode1", COPY_MODE1, "DVTMP_COPY_MODE1"},
 	{"copymode2", COPY_MODE2, "DVTMP_COPY_MODE2"},
 	{"paste", PASTE, "DVTMP_PASTE"},
-	{"view", VIEW, "DVTMP_VIEW"}};
+	{"view", VIEW, "DVTMP_VIEW"},
+	{"toggleview", TOGGLE_VIEW, "DVTMP_TOGGLE_VIEW"},
+	{"tag", TAG_KEY, "DVTMP_TAG"},
+	{"toggletag", TOGGLE_TAG_KEY, "DVTMP_TOGGLE_TAG"}};
 
 KeyBinding *obindings;
 
