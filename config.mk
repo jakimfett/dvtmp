@@ -1,5 +1,5 @@
 # dvtmp version
-VERSION = 0.16.4b
+VERSION = 0.16.5b
 
 # Customize below to fit your system
 

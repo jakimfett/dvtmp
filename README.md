@@ -14,6 +14,11 @@ for dvtmp are the same as dvtm.
 
 ## News
 
+Forked release:
+- [dvtmp-0.16.5b](https://github.com/taichifan/dvtmp/archive/v0.16.5b.tar.gz)
+- [dvtmp-0.16.4b](https://github.com/taichifan/dvtmp/archive/v0.16.4b.tar.gz)
+
+Original releases:
 - [dvtm-0.14](http://www.brain-dump.org/projects/dvtm/dvtm-0.14.tar.gz)
   [released](http://lists.suckless.org/dev/1502/25558.html) (19.02.2015)
 - [dvtm-0.13](http://www.brain-dump.org/projects/dvtm/dvtm-0.13.tar.gz)
