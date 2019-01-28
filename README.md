@@ -1,4 +1,4 @@
-# dvtm-plus - dynamic virtual terminal manager configurable by an ini file whichon unix is in ~/.dvtm-plus/config
+# dvtmp - dynamic virtual terminal manager configurable by an ini file whichon unix is in ~/.dvtmp/config
 
 This program is modifed from 
 [dvtm](http://www.brain-dump.org/projects/dvtm/) brings the concept
@@ -232,10 +232,10 @@ There are some pre defined macros to ease configuration.
 
 This means you haven't installed the `dvtm.info` terminfo description
 which can be done with `tic -s dvtm.info`. If for some reason you
-can't install new terminfo descriptions set the `DVTM_PLUS_TERM` environment
+can't install new terminfo descriptions set the `DVTMP_TERM` environment
 variable to a known terminal when starting `dvtm` as in
 
-    $ DVTM_PLUS_TERM=rxvt dvtm
+    $ DVTMP_TERM=rxvt dvtm
 
 This will instruct dvtm to use rxvt as `$TERM` value within its windows.
 
