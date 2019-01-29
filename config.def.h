@@ -259,3 +259,8 @@ static Editor editors[] = {
 	{ .name = "less",        .argv = { "less", "-R", "+%d", NULL }, .filter = false, .color = true  },
 	{ .name = "more",        .argv = { "more", "+%d", NULL       }, .filter = false, .color = false },
 };
+
+#ifdef LOGNAME
+static FILE *logfn = NULL;
+#endif
+

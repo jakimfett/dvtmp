@@ -9,14 +9,19 @@ endif
 
 RPM_DIRS = BUILD BUILDROOT RPMS SOURCES SPECS SRPMS
 
-SRC = dvtmp.c vt.c ini.c
-DIST_FILES = LICENSE Makefile README.md test-bashrc testsuite.sh config.def.h config.mk \
+DVTMP_SRC = dvtmp.c vt.c ini.c
+DVTMP_EDITOR_SRC = dvtmp-editor.c
+MANUALS = $(PGM_NAME).1 $(PGM_NAME)-editor.1 $(PGM_NAME)-pager.1
+
+DIST_FILES = LICENSE Makefile README.md test-bashrc testsuite.sh \
+	        testall.sh testsuite2.sh config.def.h config.mk \
 		vt.h forkpty-aix.c forkpty-sunos.c tile.c bstack.c \
 		ini.h tstack.c vstack.c grid.c fullscreen.c fibonacci.c \
-		$(PGM_NAME)-status $(PGM_NAME).info $(PGM_NAME).1
-OBJ = ${SRC:.c=.o}
+		$(PGM_NAME)-status $(PGM_NAME).info $(PGM_NAME)-pager $(MANUALS)
 
-all: clean options dvtmp
+DVTMP_OBJ = ${DVTMP_SRC:.c=.o}
+
+all: clean options ${PKG_NAME} ${PKG_NAME}-editor
 
 options:
 	@echo $(PKG_NAME) build options:
@@ -31,11 +36,15 @@ config.h:
 	@echo CC $<
 	@${CC} -c ${CFLAGS} $<
 
-${OBJ}: config.h config.mk
+${DVTMP_OBJ}: config.h config.mk
 
-dvtmp: ${OBJ}
+dvtmp: ${DVTMP_OBJ}
 	@echo CC -o $@
-	@${CC} -o $@ ${OBJ} ${LDFLAGS}
+	@${CC} -o $@ ${DVTMP_OBJ} ${LDFLAGS}
+
+dvtmp-editor: $(DVTMP_EDITOR_SRC)
+	@echo CC -o $@
+	@${CC} ${CFLAGS} $^ ${LDFLAGS} -o $@
 
 debug: clean
 	@echo "CFLAGS   = ${LOG_DEBUG_FLAGS}"
@@ -44,18 +53,28 @@ debug: clean
 
 clean:
 	@echo cleaning
-	@rm -f $(PGM_NAME) ${OBJ} $(PKG_NAME)-${VERSION}.tar.gz
+	@rm -f $(PGM_NAME) ${DVTMP_OBJ} ${DVTMP_EDITOR_OBJ} $(PKG_NAME)-${VERSION}.tar.gz
 
-dist: clean
-	@echo creating dist tarball
+tarball: clean
+	@echo creating tarball
 	@mkdir -p $(PKG_NAME)-${VERSION}
-	@cp -R $(SRC) $(DIST_FILES) \
+	@cp -R $(DVTMP_SRC) $(DVTMP_EDITOR_SRC) $(DIST_FILES) \
 		 $(PKG_NAME)-${VERSION}
 	@tar -cf $(PKG_NAME)-${VERSION}.tar $(PKG_NAME)-${VERSION}
 	@gzip $(PKG_NAME)-${VERSION}.tar
 	@rm -rf $(PKG_NAME)-${VERSION}
 
-dist-rpm: clean dist
+dist: tarball
+	@echo creating dist
+	@git archive --prefix=$(PKG_NAME)-${VERSION}/ -o $(PKG_NAME)-${VERSION}.tar.gz HEAD
+
+man:
+	@for m in ${MANUALS}; do \
+		echo "Generating $$m"; \
+		sed -e "s/VERSION/${VERSION}/" "$$m" | mandoc -W warning -T utf8 -T xhtml -O man=%N.%S.html -O style=mandoc.css 1> "$$m.html" || true; \
+	done
+
+build-rpm: clean tarball
 	@rpmdev-setuptree
 	@mv $(PKG_NAME)-${VERSION}.tar.gz ~/rpmbuild/SOURCES/
 	@cp $(PKG_NAME).spec ~/rpmbuild/SPECS

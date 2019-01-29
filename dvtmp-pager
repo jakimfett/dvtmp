@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ ! -z "$DVTMP_PAGER" ]; then
+	PAGER="$DVTMP_PAGER"
+elif [ ! -z "$PAGER" ]; then
+	PAGER="$PAGER"
+else
+	PAGER="less -R"
+fi
+
+exec $PAGER "$@"

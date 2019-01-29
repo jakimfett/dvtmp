@@ -1,5 +1,5 @@
 Name:           dvtmp
-Version:        0.16.6b
+Version:        0.16.7b
 Release:        5%{?dist}
 Summary:        Configurable tiling window management for the console
 License:        MIT and ISC
