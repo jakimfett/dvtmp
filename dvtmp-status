@@ -1,6 +1,6 @@
 #!/bin/sh
 
-FIFO="/tmp/dvtm-plus-status.$$"
+FIFO="/tmp/dvtmp-status.$$"
 
 [ -p "$FIFO" ] || mkfifo -m 600 "$FIFO" || exit 1
 
@@ -10,7 +10,7 @@ while true; do
 done > "$FIFO" &
 
 STATUS_PID=$!
-dvtm-plus -s "$FIFO" "$@" 2> /dev/null
+dvtmp -s "$FIFO" "$@" 2> /dev/null
 kill $STATUS_PID
 wait $STATUS_PID 2> /dev/null
 rm -f "$FIFO"

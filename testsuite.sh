@@ -3,9 +3,9 @@
 
 MOD="" # CTRL+g
 ESC="" # \e
-DVTM_PLUS="./dvtm-plus"
-export DVTM_PLUS_EDITOR="vis"
-LOG="dvtm-plus.log"
+DVTMP="./dvtmp"
+export DVTMP_EDITOR="vis"
+LOG="dvtmp.log"
 TEST_LOG="$0.log"
 UTF8_TEST_FN="UTF-8-demo.txt"
 UTF8_TEST_URL="http://www.cl.cam.ac.uk/~mgk25/ucs/examples/$UTF8_TEST_FN"
@@ -16,8 +16,8 @@ if [ "$1" = "--debug" ] ; then
 else
 	keep_log=0
 fi
-[ ! -z "$1" ] && DVTM_PLUS="$1"
-[ ! -x "$DVTM_PLUS" ] && echo "usage: [--debug] $0 path-to-dvtm-plus-binary" && exit 1
+[ ! -z "$1" ] && DVTMP="$1"
+[ ! -x "$DVTMP" ] && echo "usage: [--debug] $0 path-to-dvtmp-binary" && exit 1
 
 dvtm_plus_input() {
 	printf "$1"
@@ -67,10 +67,10 @@ if ! which vis > /dev/null 2>&1 ; then
 fi
 
 {
-	echo "Testing $DVTM_PLUS" 1>&2
-	$DVTM_PLUS -v 1>&2
+	echo "Testing $DVTMP" 1>&2
+	$DVTMP -v 1>&2
 	test_copymode && echo "copymode: OK" 1>&2 || echo "copymode: FAIL" 1>&2;
-} 2> "$TEST_LOG" | $DVTM_PLUS -m ^g 2> $LOG
+} 2> "$TEST_LOG" | $DVTMP -m ^g 2> $LOG
 
 cat "$TEST_LOG"
 if [ $? -eq 0 -a $keep_log -eq 0 ] ; then

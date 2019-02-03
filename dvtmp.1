@@ -1,9 +1,9 @@
-.TH DVTM_PLUS 1 dvtm-plus\-VERSION
+.TH DVTMP 1 dvtmp\-VERSION
 .nh
 .SH NAME
-dvtm-plus \- dynamic virtual terminal manager which is configurable
+dvtmp \- dynamic virtual terminal manager which is configurable
 .SH SYNOPSIS
-.B dvtm-plus
+.B dvtmp
 .RB [ \-v ]
 .RB [ \-M ]
 .RB [ \-m
@@ -22,10 +22,10 @@ dvtm-plus \- dynamic virtual terminal manager which is configurable
 .IR cmd-fifo ]
 .RI [ command \ ... "" ]
 .SH DESCRIPTION
-dvtm-plus is a dynamic tiling window manager which is configurable for the console.
+dvtmp is a dynamic tiling window manager which is configurable for the console.
 As a console window manager it tries to make it easy to work with multiple
 console based applications. It is configurable by an ini file
-~/.dvtm-plus/config.
+~/.dvtmp/config.
 .SH OPTIONS
 .TP
 .B \-v
@@ -60,7 +60,7 @@ It also can be set with title in the main section of the ini file.
 Open or create the named pipe
 .I status-fifo
 read its content and display it in the statusbar. See the
-.I dvtm-plus-status
+.I dvtmp-status
 script for a usage example.
 .TP
 .BI \-c \ cmd-fifo
@@ -87,59 +87,59 @@ command line option or
 with mod in the main section of the ini file.
 .TP
 .B Mod\-c
-Create a new shell window. Change with DVTM_PLUS_CREATE environment
+Create a new shell window. Change with DVTMP_CREATE environment
 variable or
 with create in the keys section of the ini file.
 .TP
 .B Mod\-C
 Create a new shell window using the current working directory of the
-focused window. Change with DVTM_PLUS_CREATE_CWD environment variable or
+focused window. Change with DVTMP_CREATE_CWD environment variable or
 with create_cwd in the keys section of the ini file.
 .TP
 .B Mod\-x\-x
-Close focused window. Change with the DVTM_PLUS_KILL_CLIENT
+Close focused window. Change with the DVTMP_KILL_CLIENT
 environment variable or
 with kill_client in the keys section of the ini file.
 .TP
 .B Mod\-l
 Increases the master area width about 5% (all except grid and 
-fullscreen layout). Change with the DVTM_PLUS_MASTER_DECR environment
+fullscreen layout). Change with the DVTMP_MASTER_DECR environment
 variable or
 with incmaster in the keys section of the ini file.
 .TP
 .B Mod\-h
 Decreases the master area width about 5% (all except grid and
-fullscreen layout). Change with the DVTM_PLUS_MASTER_INCR environment
+fullscreen layout). Change with the DVTMP_MASTER_INCR environment
 variable or
 with decrmaster in the keys section of the ini file.
 .TP
 .B Mod\-i
 Increase number of windows displayed in the master area. Change with
-the DVTM_PLUS_INCR_WINDOWS environment variable.
+the DVTMP_INCR_WINDOWS environment variable.
 with decrmaster in the keys section of the ini file.
 .TP
 .B Mod\-d
 Decrease number of windows displayed in the master area. Change with
-the DVTM_PLUS_DECR_WINDOWS environment variable.
+the DVTMP_DECR_WINDOWS environment variable.
 with decrmaster in the keys section of the ini file.
 .TP
 .B Mod\-j
-Focus next window. Change with the DVTM_PLUS_FOCUS_NEXT environment
+Focus next window. Change with the DVTMP_FOCUS_NEXT environment
 variable or
 with focusnext in the keys section of the ini file.
 .TP
 .B Mod\-k
-Focus previous window. Change with the DVTM_PLUS_FOCUS_PREV environment
+Focus previous window. Change with the DVTMP_FOCUS_PREV environment
 variable or
 with focusprev in the keys section of the ini file.
 .TP
 .B Mod\-J
-Focus next non minimized window. Change with the DVTM_PLUS_FOCUS_NEXT_MIN
+Focus next non minimized window. Change with the DVTMP_FOCUS_NEXT_MIN
 environment variable or
 with focusnextnm in the keys section of the ini file.
 .TP
 .B Mod\-K
-Focus previous non minimized window. Change with the DVTM_PLUS_FOCUS_PREV_MINV
+Focus previous non minimized window. Change with the DVTMP_FOCUS_PREV_MINV
 environment variable or
 with focusprevnm in the keys section of the ini file.
 .TP
@@ -149,7 +149,7 @@ Focus the
 window.
 .TP
 .B Mod\-Tab
-Focus previously selected window. Change with the DVTM_PLUS_FOCUS_PREV_WINDOW
+Focus previously selected window. Change with the DVTMP_FOCUS_PREV_WINDOW
 environment variable or
 with focuslast in the keys section of the ini file.
 .TP
@@ -159,7 +159,7 @@ with toggleminimize in the keys section of the ini file.
 .TP
 .B Mod\-m
 Maximize current window (change to fullscreen layout). Change with the 
-DVTM_PLUS_MAX_WINDOW environment variable or
+DVTMP_MAX_WINDOW environment variable or
 with max_window in the keys section of the ini file.
 .TP
 .B Shift\-PageUp
@@ -174,71 +174,71 @@ Scroll down.
 .TP
 .B Mod\-Space
 Toggle between defined layouts (affects all windows). Change with the
-DVTM_PLUS_TOGGLE_LAYOUTS environment variable or
+DVTMP_TOGGLE_LAYOUTS environment variable or
 with toggle_layouts in the keys section of the ini file.
 .TP
 .B Mod\-Enter
 Zooms/cycles current window to/from master area. Change with the
-DVTM_PLUS_ZOOM environment variable or
+DVTMP_ZOOM environment variable or
 with zoom in the keys section of the ini file.
 .TP
 .B Mod\-f
 Change to vertical stack tiling layout. Change with the
-DVTM_PLUS_TILE_VERTICAL environment variable or
+DVTMP_TILE_VERTICAL environment variable or
 with setlayout_vertical in the keys section of the ini file.
 .TP
 .B Mod\-b
-Change to bottom stack tiling layout. Change with the DVTM_PLUS_TILE_BOTTOM
+Change to bottom stack tiling layout. Change with the DVTMP_TILE_BOTTOM
 environment variable or
 with setlayout_bottom in the keys section of the ini file.
 .TP
 .B Mod\-g
-Change to grid layout. Change with the DVTM_PLUS_TILE_GRID environment
+Change to grid layout. Change with the DVTMP_TILE_GRID environment
 variable or
 with setlayout_grid in the keys section of the ini file.
 .TP
 .B Mod\-s
-Show/hide the status bar. Change with the DVTM_PLUS_SHOW_HIDE_STATUS
+Show/hide the status bar. Change with the DVTMP_SHOW_HIDE_STATUS
 environment variable or
 with togglebar in the keys section of the ini file.
 .TP
 .B Mod\-S
 Toggle position of the status bar between top and bottom. Change with the
-DVTM_PLUS_TOGGLE_STATUS_LOC environment variable or
+DVTMP_TOGGLE_STATUS_LOC environment variable or
 with togglebarpos in the keys section of the ini file.
 .TP
 .B Mod\-r
 .TQ
 .B Mod\-^L
-Redraw whole screen.  Change control mod L with the DVTM_PLUS_REDRAW1
-environment variable. Change the Mod with r with the DVTM_PLUS_REDRAW2
+Redraw whole screen.  Change control mod L with the DVTMP_REDRAW1
+environment variable. Change the Mod with r with the DVTMP_REDRAW2
 environment variable.
 Or with redraw1 and redraw2 respectively in the keys section of the ini file.
 .TP
 .B Mod\-a
 Toggle keyboard multiplexing mode, if activated keypresses are sent to all
-visible windows. Change with the DVTM_PLUS_MULTIPLEX_TOGGLE environment
+visible windows. Change with the DVTMP_MULTIPLEX_TOGGLE environment
 variable or
 with toggler_multiplex in the keys section of the ini file.
 .TP
 .B Mod\-M
-Toggle dvtm-plus mouse grabbing. Change with the DVTM_PLUS_TOGGLE_MOUSE
+Toggle dvtmp mouse grabbing. Change with the DVTMP_TOGGLE_MOUSE
 environment variable or
 with togglemouse in the keys section of the ini file.
 .TP
 .B Mod\-e
 Enter copy mode (see section below for further information). Change with
-the DVTM_PLUS_COPY_MODE1 environment variable or
+the DVTMP_COPY_MODE1 environment variable or
 with copymode1 in the keys section of the ini file.
 .TP
 .B Mod\-/
 Enter copy mode and start searching forward (assumes a vi-like editor).
-Change with the DVTM_PLUS_COPY_MODE2 environment variable or
+Change with the DVTMP_COPY_MODE2 environment variable or
 with copymode2 in the keys section of the ini file.
 .TP
 .B Mod\-p
 Paste last copied text from copy mode at current cursor position. Change
-with the DVTM_PLUS_PASTE environment variable or
+with the DVTMP_PASTE environment variable or
 with paste in the keys section of the ini file.
 .TP
 .B Mod\-?
@@ -251,7 +251,7 @@ Send the Mod key.
 .TQ
 .B Mod-v-[1..n]
 View all windows with nth tag.
-Change with the DVTM_PLUS_VIEW environment variable or
+Change with the DVTMP_VIEW environment variable or
 with view in the keys section of the ini file.
 .TP
 .B Mod-0
@@ -263,34 +263,34 @@ See above for changing v to another key.
 .TP
 .B Mod-V-[1..n]
 Add/remove all windows with nth tag to/from the view.
-Change with the DVTM_PLUS_TOGGLE_VIEW environment variable or
+Change with the DVTMP_TOGGLE_VIEW environment variable or
 with toggleview in the keys section of the ini file.
 .TP
 .B Mod-t-[1..n]
 Apply nth tag to focused window.
-Change with the DVTM_PLUS_TAG environment variable or
+Change with the DVTMP_TAG environment variable or
 with tag in the keys section of the ini file.
 .TP
 .B Mod-T-[1..n]
 Add/remove nth tag to/from focused window.
-Change with the DVTM_PLUS_TOGGLE_TAG environment variable or
+Change with the DVTMP_TOGGLE_TAG environment variable or
 with toggletag in the keys section of the ini file.
 .TP
 .B Mod\-q\-q
-Quit dvtm-plus.
+Quit dvtmp.
 .SS Mouse commands
 .TP
 .B Copy and Paste
-By default dvtm-plus captures mouse events to provide the actions listed below.
+By default dvtmp captures mouse events to provide the actions listed below.
 Unfortunately this interferes with the standard X copy and paste mechanism.
 To work around this you need to hold down
 .B Shift
 while selecting or pasting text.
-Alternatively you can disable mouse support at compile time, start dvtm-plus with the
+Alternatively you can disable mouse support at compile time, start dvtmp with the
 .B -M
 flag or toggle mouse support during runtime with
 .BR Mod\-M .
-Change with the DVTM_PLUS_TOGGLE_MOUSE environment variable or
+Change with the DVTMP_TOGGLE_MOUSE environment variable or
 with togglemouse in the keys section of the ini file.
 .TP
 .B Button1 click
@@ -312,33 +312,33 @@ register and can be pasted into other clients (via
 ) This works with vis and some other editors but not vim. 
 .SH ENVIRONMENT VARIABLES not listed above
 .TP
-.B DVTM_PLUS
-Each process spawned by dvtm-plus will have this variable set to the dvtm-plus version
+.B DVTMP
+Each process spawned by dvtmp will have this variable set to the dvtmp version
 it is running under.
 .TP
-.B DVTM_PLUS_WINDOW_ID
+.B DVTMP_WINDOW_ID
 Each process also has access to its constant and unique window id.
 .TP
-.B DVTM_PLUS_CMD_FIFO
-If the -c command line argument was specified upon dvtm-plus startup, this variable
+.B DVTMP_CMD_FIFO
+If the -c command line argument was specified upon dvtmp startup, this variable
 will be set to the file name of the named pipe. Thus allowing the process
-to send commands back to dvtm-plus.
+to send commands back to dvtmp.
 .TP
-.B DVTM_PLUS_TERM
-By default dvtm-plus uses its own terminfo file and therefore sets
-.BR TERM=dvtm-plus
+.B DVTMP_TERM
+By default dvtmp uses its own terminfo file and therefore sets
+.BR TERM=dvtmp
 within the client windows. This can be overridden by setting the
-.BR DVTM_PLUS_TERM
-environment variable to a valid terminal name before launching dvtm-plus.
+.BR DVTMP_TERM
+environment variable to a valid terminal name before launching dvtmp.
 .TP
-.B DVTM_PLUS_EDITOR
-When entering the copymode dvtm-plus pipes the whole scroll back buffer to
-.BR DVTM_PLUS_EDITOR
+.B DVTMP_EDITOR
+When entering the copymode dvtmp pipes the whole scroll back buffer to
+.BR DVTMP_EDITOR
 which is launched with
 .BR \-
 (indicating to read from stdin) as its only argument.
 If
-.BR DVTM_PLUS_EDITOR
+.BR DVTMP_EDITOR
 is not set
 .BR EDITOR
 is checked, if this is also not set the default value specified in
@@ -346,17 +346,17 @@ is checked, if this is also not set the default value specified in
 is used instead.
 .SH EXAMPLE
 See the
-.I dvtm-plus-status
+.I dvtmp-status
 script as an example of how to display text in the
 status bar.
 .SH CUSTOMIZATION
-dvtm-plus is customized by creating a custom
+dvtmp is customized by creating a custom
 .I config.h
 and (re)compiling the source code or by setting the
-above environment variables or an ini file .dvtm-plus.conf in the home
+above environment variables or an ini file .dvtmp.conf in the home
 directory. The ini file takes precedence over the environment variables
 which can be defined in both places. This was changed so that it would be more acccessible to people
 who can't code or with disabilities.
 This keeps it fast, secure and simple.
 .SH AUTHOR
-dvtm-plus is written by Marc André Tanner <mat at brain-dump.org>
+dvtmp is written by Marc André Tanner <mat at brain-dump.org>

@@ -18,7 +18,7 @@ diff -ur ./Makefile ../b/Makefile
 @@ -75,13 +75,11 @@
  	@rpmbuild -v -ba --clean ~/rpmbuild/SPECS/$(PKG_NAME).spec
  
- install: dvtm-plus
+ install: dvtmp
 -	@echo stripping executable
 -	@${STRIP} $(PGM_NAME)
  	@echo installing executable file to ${DESTDIR}${PREFIX}/bin

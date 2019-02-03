@@ -1,4 +1,4 @@
-Name:           dvtm-plus
+Name:           dvtmp
 Version:        0.17.0dev
 Release:        5%{?dist}
 Summary:        Configurable tiling window management for the console
@@ -15,12 +15,12 @@ BuildRequires:  ncurses-devel
 BuildRequires:  sed
 
 %description
-dvtm-plus brings the concept of tiling window management, popularized by
+dvtmp brings the concept of tiling window management, popularized by
 X11-window managers like dwm to the console. It is an enhancement
 to dvtm. As a console window
 manager it tries to make it easy to work with multiple console based
-programs like vim, mutt, cmus or irssi. Unlike dvtm and dwm, dvtm-plus has
-a configuration file ~/.dvtm-plus/config that allows you to configure the keys
+programs like vim, mutt, cmus or irssi. Unlike dvtm and dwm, dvtmp has
+a configuration file ~/.dvtmp/config that allows you to configure the keys
 or environment variables.
 
 %prep

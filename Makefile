@@ -1,5 +1,5 @@
 include config.mk
-PKG_NAME = dvtm-plus
+PKG_NAME = dvtmp
 PGM_NAME = $(PKG_NAME)
 ifeq (${LOGNAME},)
 LOG_DEBUG_FLAGS = ${DEBUG_CFLAGS}
@@ -9,14 +9,14 @@ endif
 
 RPM_DIRS = BUILD BUILDROOT RPMS SOURCES SPECS SRPMS
 
-SRC = dvtm-plus.c vt.c ini.c
+SRC = dvtmp.c vt.c ini.c
 DIST_FILES = LICENSE Makefile README.md test-bashrc testsuite.sh config.def.h config.mk \
 		vt.h forkpty-aix.c forkpty-sunos.c tile.c bstack.c \
 		ini.h tstack.c vstack.c grid.c fullscreen.c fibonacci.c \
 		$(PGM_NAME)-status $(PGM_NAME).info $(PGM_NAME).1
 OBJ = ${SRC:.c=.o}
 
-all: clean options dvtm-plus
+all: clean options dvtmp
 
 options:
 	@echo $(PKG_NAME) build options:
@@ -33,7 +33,7 @@ config.h:
 
 ${OBJ}: config.h config.mk
 
-dvtm-plus: ${OBJ}
+dvtmp: ${OBJ}
 	@echo CC -o $@
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
 
@@ -59,10 +59,10 @@ dist-rpm: clean dist
 	@rpmdev-setuptree
 	@mv $(PKG_NAME)-${VERSION}.tar.gz ~/rpmbuild/SOURCES/
 	@cp $(PKG_NAME).spec ~/rpmbuild/SPECS
-	@cp dvtm-plus-$(BASE_VERSION)-build.patch  ~/rpmbuild/SOURCES
+	@cp dvtmp-$(BASE_VERSION)-build.patch  ~/rpmbuild/SOURCES
 	@rpmbuild -v -ba --clean ~/rpmbuild/SPECS/$(PKG_NAME).spec
 
-install: dvtm-plus
+install: dvtmp
 	@echo stripping executable
 	@${STRIP} $(PGM_NAME)
 	@echo installing executable file to ${DESTDIR}${PREFIX}/bin
