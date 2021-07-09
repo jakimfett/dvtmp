@@ -228,6 +228,7 @@ extern Screen screen;
 static unsigned int waw, wah, wax, way;
 static Client *clients = NULL;
 static char *title;
+static KeyCombo keys;
 
 #include "config.h"
 
@@ -357,6 +358,13 @@ drawbar(void) {
 	attrset(runinall ? TAG_SEL : TAG_NORMAL);
 	addstr(layout->symbol);
 	attrset(TAG_NORMAL);
+
+	for (unsigned int i = 0; i < MAX_KEYS && keys[i]; i++) {
+		if (keys[i] < ' ')
+			printw("^%c", 'A' - 1 + keys[i]);
+		else
+			printw("%c", keys[i]);
+	}
 
 	getyx(stdscr, y, x);
 	(void)y;
@@ -1156,7 +1164,8 @@ copymode(const char *args[]) {
 	snprintf(argline, sizeof(argline), "+%d", line);
 	argv[1] = argline;
 
-	if (vt_forkpty(sel->editor, args[0], argv, NULL, NULL, to, from) < 0) {
+	char *cwd = getcwd_by_pid(sel);
+	if (vt_forkpty(sel->editor, args[0], argv, cwd, NULL, to, from) < 0) {
 		vt_destroy(sel->editor);
 		sel->editor = NULL;
 		return;
@@ -1836,11 +1845,12 @@ parse_args(int argc, char *argv[]) {
 				updatebarpos();
 				break;
 			case 'c': {
-				const char *fifo;
+				char *fifo;
 				cmdfifo.fd = open_or_create_fifo(argv[++arg], &cmdfifo.file);
 				if (!(fifo = realpath(argv[arg], NULL)))
 					error("%s\n", strerror(errno));
 				setenv("DVTM_CMD_FIFO", fifo, 1);
+				free(fifo);
 				break;
 			}
 			default:
@@ -1852,7 +1862,6 @@ parse_args(int argc, char *argv[]) {
 
 int
 main(int argc, char *argv[]) {
-	KeyCombo keys;
 	unsigned int key_index = 0;
 	memset(keys, 0, sizeof(keys));
 
@@ -1937,6 +1946,9 @@ main(int argc, char *argv[]) {
 					memset(keys, 0, sizeof(keys));
 					keypress(code);
 				}
+				drawbar();
+				if (is_content_visible(sel))
+					wnoutrefresh(sel->window);
 			}
 			if (r == 1) /* no data available on pty's */
 				continue;
