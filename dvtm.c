@@ -52,7 +52,7 @@ typedef struct {
 	int history;
 	int w;
 	int h;
-	volatile sig_atomic_t need_resize;
+	bool need_resize;
 } Screen;
 
 typedef struct {
@@ -228,6 +228,7 @@ extern Screen screen;
 static unsigned int waw, wah, wax, way;
 static Client *clients = NULL;
 static char *title;
+static KeyCombo keys;
 
 #include "config.h"
 
@@ -248,6 +249,10 @@ static const char *shell;
 static Register copyreg;
 static volatile sig_atomic_t running = true;
 static bool runinall = false;
+static int sigwinch_pipe[] = {-1, -1};
+static int sigchld_pipe[] = {-1, -1};
+
+enum {PIPE_RD, PIPE_WR};
 
 static void
 eprint(const char *errstr, ...) {
@@ -353,6 +358,13 @@ drawbar(void) {
 	attrset(runinall ? TAG_SEL : TAG_NORMAL);
 	addstr(layout->symbol);
 	attrset(TAG_NORMAL);
+
+	for (unsigned int i = 0; i < MAX_KEYS && keys[i]; i++) {
+		if (keys[i] < ' ')
+			printw("^%c", 'A' - 1 + keys[i]);
+		else
+			printw("%c", keys[i]);
+	}
 
 	getyx(stdscr, y, x);
 	(void)y;
@@ -558,6 +570,7 @@ settitle(Client *c) {
 	if (t && (term = getenv("TERM")) && !strstr(term, "linux")) {
 		printf("\033]0;%s\007", t);
 		fflush(stdout);
+		wnoutrefresh(c->window);
 	}
 }
 
@@ -698,6 +711,11 @@ get_client_by_coord(unsigned int x, unsigned int y) {
 
 static void
 sigchld_handler(int sig) {
+	write(sigchld_pipe[PIPE_WR], "\0", 1);
+}
+
+static void
+handle_sigchld() {
 	int errsv = errno;
 	int status;
 	pid_t pid;
@@ -731,6 +749,11 @@ sigchld_handler(int sig) {
 
 static void
 sigwinch_handler(int sig) {
+	write(sigwinch_pipe[PIPE_WR], "\0", 1);
+}
+
+static void
+handle_sigwinch() {
 	screen.need_resize = true;
 }
 
@@ -939,6 +962,14 @@ getshell(void) {
 	return "/bin/sh";
 }
 
+static bool
+set_blocking(int fd, bool blocking) {
+	int flags = fcntl(fd, F_GETFL, 0);
+	if (flags < 0) return false;
+	flags = blocking ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK);
+	return !fcntl(fd, F_SETFL, flags);
+}
+
 static void
 setup(void) {
 	shell = getshell();
@@ -962,6 +993,23 @@ setup(void) {
 		colors[i].pair = vt_color_reserve(colors[i].fg, colors[i].bg);
 	}
 	resize_screen();
+
+	int *pipes[] = {&sigwinch_pipe[0], &sigchld_pipe[0]};
+	for (int i = 0; i < 2; ++i) {
+		int r = pipe(pipes[i]);
+		if (r < 0) {
+			perror("pipe()");
+			exit(EXIT_FAILURE);
+		}
+
+		for (int j = 0; j < 2; ++j) {
+			if (!set_blocking(pipes[i][j], false)) {
+				perror("fcntl()");
+				exit(EXIT_FAILURE);
+			}
+		}
+	}
+
 	struct sigaction sa;
 	memset(&sa, 0, sizeof sa);
 	sa.sa_flags = 0;
@@ -1116,7 +1164,8 @@ copymode(const char *args[]) {
 	snprintf(argline, sizeof(argline), "+%d", line);
 	argv[1] = argline;
 
-	if (vt_forkpty(sel->editor, args[0], argv, NULL, NULL, to, from) < 0) {
+	char *cwd = getcwd_by_pid(sel);
+	if (vt_forkpty(sel->editor, args[0], argv, cwd, NULL, to, from) < 0) {
 		vt_destroy(sel->editor);
 		sel->editor = NULL;
 		return;
@@ -1796,11 +1845,12 @@ parse_args(int argc, char *argv[]) {
 				updatebarpos();
 				break;
 			case 'c': {
-				const char *fifo;
+				char *fifo;
 				cmdfifo.fd = open_or_create_fifo(argv[++arg], &cmdfifo.file);
 				if (!(fifo = realpath(argv[arg], NULL)))
 					error("%s\n", strerror(errno));
 				setenv("DVTM_CMD_FIFO", fifo, 1);
+				free(fifo);
 				break;
 			}
 			default:
@@ -1812,22 +1862,14 @@ parse_args(int argc, char *argv[]) {
 
 int
 main(int argc, char *argv[]) {
-	KeyCombo keys;
 	unsigned int key_index = 0;
 	memset(keys, 0, sizeof(keys));
-	sigset_t emptyset, blockset;
 
 	setenv("DVTM", VERSION, 1);
 	if (!parse_args(argc, argv)) {
 		setup();
 		startup(NULL);
 	}
-
-	sigemptyset(&emptyset);
-	sigemptyset(&blockset);
-	sigaddset(&blockset, SIGWINCH);
-	sigaddset(&blockset, SIGCHLD);
-	sigprocmask(SIG_BLOCK, &blockset, NULL);
 
 	while (running) {
 		int r, nfds = 0;
@@ -1841,9 +1883,15 @@ main(int argc, char *argv[]) {
 		FD_ZERO(&rd);
 		FD_SET(STDIN_FILENO, &rd);
 
+		FD_SET(sigwinch_pipe[PIPE_RD], &rd);
+		nfds = MAX(nfds, sigwinch_pipe[PIPE_RD]);
+
+		FD_SET(sigchld_pipe[PIPE_RD], &rd);
+		nfds = MAX(nfds, sigchld_pipe[PIPE_RD]);
+
 		if (cmdfifo.fd != -1) {
 			FD_SET(cmdfifo.fd, &rd);
-			nfds = cmdfifo.fd;
+			nfds = MAX(nfds, cmdfifo.fd);
 		}
 
 		if (bar.fd != -1) {
@@ -1867,7 +1915,7 @@ main(int argc, char *argv[]) {
 		}
 
 		doupdate();
-		r = pselect(nfds + 1, &rd, NULL, NULL, NULL, &emptyset);
+		r = select(nfds + 1, &rd, NULL, NULL, NULL);
 
 		if (r < 0) {
 			if (errno == EINTR)
@@ -1898,9 +1946,24 @@ main(int argc, char *argv[]) {
 					memset(keys, 0, sizeof(keys));
 					keypress(code);
 				}
+				drawbar();
+				if (is_content_visible(sel))
+					wnoutrefresh(sel->window);
 			}
 			if (r == 1) /* no data available on pty's */
 				continue;
+		}
+
+		if (FD_ISSET(sigwinch_pipe[PIPE_RD], &rd)) {
+			char buf[512];
+			while (read(sigwinch_pipe[PIPE_RD], &buf, sizeof(buf)) > 0);
+			handle_sigwinch();
+		}
+
+		if (FD_ISSET(sigchld_pipe[PIPE_RD], &rd)) {
+			char buf[512];
+			while (read(sigchld_pipe[PIPE_RD], &buf, sizeof(buf)) > 0);
+			handle_sigchld();
 		}
 
 		if (cmdfifo.fd != -1 && FD_ISSET(cmdfifo.fd, &rd))
