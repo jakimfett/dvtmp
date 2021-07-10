@@ -757,6 +757,15 @@ resize_screen(void) {
 	updatebarpos();
 	clear();
 	arrange();
+
+    if(screen.w < 120 && !strcmp(layout->symbol, "[]=")) {
+        char *args[] = {"TTT"};
+        setlayout(args);
+    }
+    else if(screen.w >= 120 && !strcmp(layout->symbol, "TTT")) {
+        char *args[] = {"[]="};
+        setlayout(args);
+    }
 }
 
 static KeyBinding*
